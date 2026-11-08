@@ -33,7 +33,20 @@ Canary combines environmental hazard exposure (particulate matter PM2.5/PM10, am
 
 ## Quick Start
 
-### 1. Backend (FastAPI & Engine)
+### Fast Start (Full Stack)
+
+Run both backend and frontend together and automatically launch your browser:
+
+```bash
+./start.sh
+# or: make run
+```
+
+---
+
+### Manual Start
+
+#### 1. Backend (FastAPI & Engine)
 
 Requirements: [uv](https://docs.astral.sh/uv/getting-started/installation/) and Python 3.12+.
 
