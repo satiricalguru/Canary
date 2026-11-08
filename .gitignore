@@ -35,3 +35,5 @@ ehthumbs.db
 Thumbs.db
 image.png
 ideas/canary_scroll_enhanced_4k.mp4
+.vercel
+.env*

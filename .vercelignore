@@ -1,0 +1,21 @@
+# Ignore non-frontend files from Vercel deployment
+backend/
+fixtures/
+eval/
+ideas/
+scroll_animation_frames/
+var/
+.venv/
+.pytest_cache/
+.ruff_cache/
+*.pptx
+*.py
+*.sqlite*
+*.parquet
+docker-compose.yml
+compose.yaml
+Dockerfile
+render.yaml
+pyproject.toml
+uv.lock
+
