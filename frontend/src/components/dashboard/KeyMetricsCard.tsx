@@ -137,7 +137,7 @@ export const KeyMetricsCard: React.FC<KeyMetricsCardProps> = ({
           </h2>
           <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-canary-amber/10 border border-canary-amber/30 text-[10px] font-mono font-bold text-canary-amber">
             <span className="w-1.5 h-1.5 rounded-full bg-[#F2A33A] animate-pulse" />
-            LIVE TELEMETRY
+            SIMULATED TELEMETRY
           </span>
         </div>
 

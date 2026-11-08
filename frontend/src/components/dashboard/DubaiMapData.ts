@@ -357,6 +357,20 @@ export const DUBAI_PLACES: DubaiPlace[] = [
   },
 ];
 
+// Approximate representative points for the named areas, not facility locations.
+export const DUBAI_COORDINATES: Record<string, [number, number]> = {
+  'dxb-alquoz': [25.135, 55.225], 'dxb-jafza': [25.011, 55.073],
+  'dxb-dip': [24.997, 55.158], 'dxb-south': [24.895, 55.163],
+  'dxb-deira': [25.272, 55.316], 'dxb-warsan': [25.165, 55.418],
+  'dxb-rasalkhor': [25.174, 55.351], 'dxb-burdubai': [25.255, 55.295],
+  'dxb-barsha': [25.112, 55.202], 'dxb-dxbairport': [25.253, 55.365],
+  'dxb-bizbay': [25.186, 55.265], 'dxb-hatta': [24.803, 56.127],
+  'dxb-downtown': [25.197, 55.274], 'dxb-marina': [25.080, 55.140],
+  'dxb-jumeirah': [25.209, 55.235], 'dxb-dso': [25.120, 55.379],
+  'dxb-palm': [25.112, 55.139], 'dxb-mirdif': [25.220, 55.420],
+  'dxb-khawaneej': [25.248, 55.473],
+};
+
 export function placeToMonitoringUnit(place: DubaiPlace): MonitoringUnit {
   return {
     id: place.id,
@@ -371,8 +385,8 @@ export function placeToMonitoringUnit(place: DubaiPlace): MonitoringUnit {
         : place.category === 'logistics'
         ? 'logistics'
         : 'office',
-    latitude: 25.0 + place.y / 1000,
-    longitude: 55.1 + place.x / 1000,
+    latitude: DUBAI_COORDINATES[place.id][0],
+    longitude: DUBAI_COORDINATES[place.id][1],
     headcountBand: place.workforceCount,
     currentTier: place.tier === 'NORMAL' ? null : place.tier,
     completeness: 94,

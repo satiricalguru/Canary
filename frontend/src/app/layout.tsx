@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import 'leaflet/dist/leaflet.css';
+import { ThemeToggle } from '@/components/layout/ThemeToggle';
 import { RoleProvider } from '@/context/RoleContext';
 
 export const metadata: Metadata = {
@@ -20,7 +22,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className="bg-canvas text-canary-text antialiased selection:bg-canary-amber selection:text-canvas-deep">
-        <RoleProvider>{children}</RoleProvider>
+        <RoleProvider>{children}<ThemeToggle /></RoleProvider>
       </body>
     </html>
   );

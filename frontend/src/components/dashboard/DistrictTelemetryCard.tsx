@@ -370,7 +370,7 @@ export const DistrictTelemetryCard: React.FC<DistrictTelemetryCardProps> = ({
           <div className="space-y-2 p-3 rounded-2xl bg-black/50 border border-canary-amber/20 animate-in fade-in slide-in-from-top-2 duration-300">
             <div className="flex items-center justify-between text-[10px] font-mono font-bold uppercase tracking-wider text-canary-amber">
               <span>Granular Sensor &amp; Clinical Telemetry</span>
-              <span className="text-emerald-400">Live</span>
+              <span className="text-emerald-400">Simulated</span>
             </div>
             <div className="space-y-1.5 text-[11px] text-canary-text-2">
               <div className="flex items-center justify-between py-1 border-b border-white/5">

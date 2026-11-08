@@ -131,3 +131,40 @@ body {
   outline-offset: 2px;
 }
 
+
+html.light {
+  color-scheme: light;
+  --canvas: #f3f5f3;
+  --canvas-deep: #e9eeeb;
+  --panel: #ffffff;
+  --panel-raised: #edf3ef;
+  --panel-inset: #f3f6f3;
+  --border: #d5ded8;
+  --border-strong: #bac9bf;
+  --highlight: rgba(255,255,255,.8);
+  --text: #192d26;
+  --text-2: #455c50;
+  --text-3: #62766b;
+  --amber: #99600b;
+  --tier-watch-text: #82620b;
+  --tier-alert-text: #ad510b;
+  --tier-action-text: #ba3028;
+  --ok: #397d47;
+  --info: #346c8d;
+  --prov-real: #346c8d;
+  --prov-sim: #824c95;
+  --prov-illus: #8d631e;
+}
+html.light .topo-pattern { background-image: radial-gradient(circle at 80% 20%, rgba(242,163,58,.1), transparent 60%), linear-gradient(#edf2ee, #f3f5f3); }
+html.light .canary-panel { box-shadow: 0 8px 24px rgba(30,60,40,.08); }
+html.light .bg-\[\#1B1B1D\], html.light .bg-\[\#0E0F12\] { background-color: var(--panel); }
+.canary-map-marker { background: transparent; border: 0; }
+.canary-map-marker span { display: block; width: 16px; height: 16px; margin: 4px; background: var(--marker-color); border: 2px solid white; border-radius: 50%; box-shadow: 0 1px 7px #0009; }
+.canary-map-marker span.selected { outline: 3px solid var(--marker-color); outline-offset: 3px; }
+/* The flight animation uses a dark video backdrop in both themes. */
+html.light #flight-story { --text: #ede8df; --text-2: #d4cfc5; --text-3: #bcb6ac; --amber: #f2a33a; }
+html.light .bg-\[\#1A1608\] { background-color: #fff5db; color: #76510c; }
+
+html.light .from-\[\#1A1A1C\] { background-image: none; background-color: var(--panel); border-color: var(--border); box-shadow: 0 8px 24px rgba(30,60,40,.08); }
+html.light .bg-black\/20, html.light .bg-black\/30, html.light .bg-black\/40 { background-color: var(--panel-inset); }
+html.dark .leaflet-tile-pane { filter: brightness(.68) saturate(.72); }
