@@ -8,6 +8,7 @@
 <p>Future Health Digital Innovation Challenge · Challenge 06</p>
 
 [![Canary CI](https://github.com/satiricalguru/Canary/actions/workflows/ci.yml/badge.svg)](https://github.com/satiricalguru/Canary/actions/workflows/ci.yml)
+[![Code Review](https://github.com/satiricalguru/Canary/actions/workflows/code-review.yml/badge.svg)](https://github.com/satiricalguru/Canary/actions/workflows/code-review.yml)
 [![MIT License](https://img.shields.io/badge/license-MIT-2F3A55)](LICENSE)
 ![Next.js 16](https://img.shields.io/badge/Next.js-16-2F3A55)
 ![Python 3.12](https://img.shields.io/badge/Python-3.12-2F3A55)
