@@ -35,8 +35,8 @@ export default function SettingsPage() {
 
   return (
     <AppShell
-      title="SYSTEM SETTINGS &amp; GOVERNANCE CONTROLS"
-      description="Configure role-based surveillance boundaries, aggregate privacy suppression parameters, and external telemetry pipelines."
+      title="Settings & telemetry"
+      description="Switch demo roles and preview privacy and telemetry settings."
     >
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Column: Role & Privacy Configuration (7 Cols) */}
@@ -47,7 +47,7 @@ export default function SettingsPage() {
             trailingAction={<span className="text-xs font-mono text-canary-amber">{roleInfo.title}</span>}
           >
             <p className="text-xs text-canary-text-2 mb-4 leading-relaxed">
-              Every surveillance feed and action playbook strictly respects role boundaries. Switch your active demo profile to simulate different operational lenses.
+              Switch the demo role to explore different views. The dashboard and replay include shared illustrative scenarios.
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
@@ -76,19 +76,19 @@ export default function SettingsPage() {
             {/* Current Role Access Rights */}
             <div className="p-3.5 rounded-panel bg-panel-inset border border-border space-y-2">
               <h4 className="text-xs font-bold uppercase tracking-wider text-canary-text-2 flex items-center gap-1.5">
-                <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                <ShieldCheck className="w-4 h-4 text-status-ok" />
                 <span>Authorized Capabilities &amp; Disallowed Boundaries</span>
               </h4>
               <p className="text-xs text-canary-text-2">{roleInfo.description}</p>
               <div className="pt-2 border-t border-border flex items-center justify-between text-xs">
                 <span className="text-canary-text-3">Clinical Syndromic Detail:</span>
-                <span className={`font-semibold ${roleInfo.hasHealthDetail ? 'text-emerald-400' : 'text-[#8D8D93]'}`}>
+                <span className={`font-semibold ${roleInfo.hasHealthDetail ? 'text-status-ok' : 'text-canary-text-3'}`}>
                   {roleInfo.hasHealthDetail ? 'Authorized (Full Access)' : 'Restricted (High-Level Only)'}
                 </span>
               </div>
               <div className="pt-2 border-t border-border flex items-center justify-between text-xs">
                 <span className="text-canary-text-3">Action Sign-Off Authority:</span>
-                <span className={`font-semibold ${activeRole === 'oh_lead' || activeRole === 'hse_officer' ? 'text-emerald-400' : 'text-[#8D8D93]'}`}>
+                <span className={`font-semibold ${activeRole === 'oh_lead' || activeRole === 'hse_officer' ? 'text-status-ok' : 'text-canary-text-3'}`}>
                   {activeRole === 'oh_lead' || activeRole === 'hse_officer' ? 'Authorized Signatory' : 'Review Only (No Sign-Off)'}
                 </span>
               </div>
@@ -111,6 +111,7 @@ export default function SettingsPage() {
 
               <input
                 type="range"
+                aria-label="Preview privacy threshold"
                 min="3"
                 max="10"
                 value={kThreshold}
@@ -120,7 +121,7 @@ export default function SettingsPage() {
 
               <div className="flex justify-between text-[10px] text-canary-text-3 font-mono">
                 <span>k = 3 (Minimum)</span>
-                <span className="text-canary-amber font-semibold">k = 5 (UAE / PRD Standard)</span>
+                <span className="text-canary-amber font-semibold">k = 5 (demo default)</span>
                 <span>k = 10 (Strict)</span>
               </div>
             </div>
@@ -128,12 +129,12 @@ export default function SettingsPage() {
             {/* Ingestion Rules Check */}
             <div className="mt-4 grid grid-cols-2 gap-3 text-xs">
               <div className="p-3 rounded bg-panel-inset border border-border flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-status-ok flex-shrink-0" />
                 <span className="text-canary-text-2">Zero Personal Identifiers Stored</span>
               </div>
               <div className="p-3 rounded bg-panel-inset border border-border flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                <span className="text-canary-text-2">Append-Only Cryptographic Audit Log</span>
+                <CheckCircle2 className="w-4 h-4 text-status-ok flex-shrink-0" />
+                <span className="text-canary-text-2">Audit events recorded in the demo</span>
               </div>
             </div>
           </Panel>
@@ -144,7 +145,7 @@ export default function SettingsPage() {
           {/* Feed Telemetry Toggles */}
           <Panel title="ENVIRONMENTAL &amp; SYNDROMIC INGESTION PIPELINES">
             <p className="text-xs text-canary-text-2 mb-4">
-              Real-time feed monitors connecting satellite models, ground sensors, and clinic aggregate APIs.
+              Toggle the example feed states. These controls affect this preview only.
             </p>
 
             <div className="space-y-3 text-xs">
@@ -156,8 +157,10 @@ export default function SettingsPage() {
                 </div>
                 <button
                   onClick={() => toggleFeed('cams')}
+                  aria-label={`CAMS air quality feed preview: ${feedStatus.cams ? 'Active' : 'Disabled'}`}
+                  aria-pressed={feedStatus.cams}
                   className={`px-2.5 py-1 rounded text-[11px] font-semibold transition-colors ${
-                    feedStatus.cams ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40' : 'bg-canvas-deep text-canary-text-3'
+                    feedStatus.cams ? 'bg-emerald-500/20 text-status-ok border border-emerald-500/40' : 'bg-canvas-deep text-canary-text-3'
                   }`}
                 >
                   {feedStatus.cams ? 'Active' : 'Disabled'}
@@ -172,8 +175,10 @@ export default function SettingsPage() {
                 </div>
                 <button
                   onClick={() => toggleFeed('openMeteo')}
+                  aria-label={`Open-Meteo heat feed preview: ${feedStatus.openMeteo ? 'Active' : 'Disabled'}`}
+                  aria-pressed={feedStatus.openMeteo}
                   className={`px-2.5 py-1 rounded text-[11px] font-semibold transition-colors ${
-                    feedStatus.openMeteo ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40' : 'bg-canvas-deep text-canary-text-3'
+                    feedStatus.openMeteo ? 'bg-emerald-500/20 text-status-ok border border-emerald-500/40' : 'bg-canvas-deep text-canary-text-3'
                   }`}
                 >
                   {feedStatus.openMeteo ? 'Active' : 'Disabled'}
@@ -188,8 +193,10 @@ export default function SettingsPage() {
                 </div>
                 <button
                   onClick={() => toggleFeed('clinicEmr')}
+                  aria-label={`Clinic aggregates feed preview: ${feedStatus.clinicEmr ? 'Active' : 'Disabled'}`}
+                  aria-pressed={feedStatus.clinicEmr}
                   className={`px-2.5 py-1 rounded text-[11px] font-semibold transition-colors ${
-                    feedStatus.clinicEmr ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40' : 'bg-canvas-deep text-canary-text-3'
+                    feedStatus.clinicEmr ? 'bg-emerald-500/20 text-status-ok border border-emerald-500/40' : 'bg-canvas-deep text-canary-text-3'
                   }`}
                 >
                   {feedStatus.clinicEmr ? 'Active' : 'Disabled'}
@@ -204,8 +211,10 @@ export default function SettingsPage() {
                 </div>
                 <button
                   onClick={() => toggleFeed('absence')}
+                  aria-label={`Workforce absence feed preview: ${feedStatus.absence ? 'Active' : 'Disabled'}`}
+                  aria-pressed={feedStatus.absence}
                   className={`px-2.5 py-1 rounded text-[11px] font-semibold transition-colors ${
-                    feedStatus.absence ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40' : 'bg-canvas-deep text-canary-text-3'
+                    feedStatus.absence ? 'bg-emerald-500/20 text-status-ok border border-emerald-500/40' : 'bg-canvas-deep text-canary-text-3'
                   }`}
                 >
                   {feedStatus.absence ? 'Active' : 'Disabled'}

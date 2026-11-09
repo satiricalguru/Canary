@@ -1,289 +1,114 @@
-'use client';
-
-import React, { useEffect, useState } from 'react';
 import { AppShell } from '@/components/layout/AppShell';
 import { Panel } from '@/components/shared/Panel';
 import { ProvenanceBadge } from '@/components/shared/ProvenanceBadge';
-import { fetchBacktestSummary } from '@/lib/api/client';
-import { BacktestSummaryResponse } from '@/lib/types/api';
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  Cell,
-  ReferenceLine,
-  CartesianGrid
-} from 'recharts';
-import {
-  ShieldAlert,
-  BarChart3,
-  CheckCircle2,
-  AlertTriangle,
-  Info,
-  Clock,
-  Layers,
-  Sliders,
-  FileSpreadsheet
-} from 'lucide-react';
+import report from '@/lib/data/validation-report.json';
+
+const names = {
+  canary: 'Canary fusion',
+  ears_c2: 'Absence EARS C2',
+  clinic_cusum: 'Clinic CUSUM',
+  fixed_hazard: 'Fixed exposure',
+};
+const comparatorIds = ['canary', 'ears_c2', 'clinic_cusum', 'fixed_hazard'] as const;
+const leadIds = ['ears_c2', 'clinic_cusum', 'fixed_hazard'] as const;
+const conditions = {
+  without_environment: 'Environmental feed missing',
+  without_clinic: 'Clinic feed missing',
+  without_workplace: 'Workplace feed missing',
+  district_only: 'District rollup only',
+  reporting_delay_2d: 'Two-day reporting delay',
+  extra_noise_30pct: '30% additional noise',
+};
+const conditionIds = Object.keys(conditions) as (keyof typeof conditions)[];
+const percent = (value: number) => `${(100 * value).toFixed(1)}%`;
+const canary = report.comparators.canary;
 
 export default function ValidationPage() {
-  const [data, setData] = useState<BacktestSummaryResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchBacktestSummary().then((res) => {
-      setData(res);
-      setLoading(false);
-    });
-  }, []);
-
-  if (loading || !data) {
-    return (
-      <AppShell
-        title="VALIDATION & EVALUATION"
-        description="Empirical back-testing and operational performance benchmarks across held-out test seeds."
-      >
-        <div className="py-20 flex flex-col items-center justify-center gap-3">
-          <div className="w-8 h-8 border-2 border-canary-amber border-t-transparent rounded-full animate-spin" />
-          <span className="text-xs text-canary-text-2">Calculating back-test validation metrics...</span>
-        </div>
-      </AppShell>
-    );
-  }
-
-  // Lead-time chart format
-  const leadTimeChartData = data.comparators.map((c) => ({
-    name: c.methodName.split('(')[0].trim(),
-    leadTime: c.leadTimeDays,
-    isCanary: !!c.isCanary,
-  }));
-
   return (
-    <AppShell
-      title="VALIDATION & EVALUATION"
-      description="Empirical back-testing and operational performance benchmarks evaluated on held-out synthetic test seeds."
-    >
-      <div className="flex flex-col gap-6">
-        {/* Top Mandatory Disclaimer Banner (DESIGN.md Section 4.5) */}
-        <div className="p-4 rounded-panel bg-[#C58BD9]/10 border border-[#C58BD9]/30 flex items-start gap-3">
-          <ProvenanceBadge kind="simulated" size="md" className="mt-0.5" />
-          <div className="space-y-1">
-            <h3 className="text-xs font-bold text-canary-text uppercase tracking-wider">
-              Simulated Evaluation Ground Truth
-            </h3>
-            <p className="text-xs text-canary-text-2 leading-relaxed">
-              Results use simulated syndromic outcome data and held-out test seeds (Calibration Seed: {data.calibrationSeed}, Test Seed: {data.testSeed}). They demonstrate statistical detection capability against single-signal baselines and are <strong>not real-world clinical validation</strong>. The evaluation harness is architected to run unchanged on real aggregate data in future shadow-mode pilots.
-            </p>
-          </div>
+    <AppShell title="Validation & evaluation" description="Compare detectors on held-out, simulated health events.">
+      <div className="space-y-6">
+        <div className="flex flex-wrap items-start gap-3 rounded-panel border border-prov-sim/25 bg-prov-sim/5 p-4">
+          <ProvenanceBadge kind="simulated" />
+          <p className="max-w-3xl text-sm leading-relaxed text-canary-text-2">
+            {canary.events} injected events across {report.test_seeds.length} held-out test seeds. This is a simulation of operational performance. Clinical effectiveness requires real-world validation.
+          </p>
+        </div>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          {[
+            ['Event sensitivity', percent(canary.sensitivity), `${canary.detected_events} of ${canary.events} events detected`],
+            ['Alert precision', percent(canary.ppv), 'Share of Canary alerts linked to an event'],
+            ['False alerts / site-month', canary.false_alerts_per_unit_month.toFixed(3), `${canary.false_alerts} false alerts in the held-out run`],
+          ].map(([label, value, detail]) => (
+            <div key={label} className="canary-panel p-5">
+              <p className="text-xs font-bold text-canary-text-2">{label}</p>
+              <p className="font-editorial-serif mt-2 text-4xl tabular-nums">{value}</p>
+              <p className="mt-2 text-xs text-canary-text-2">{detail}</p>
+            </div>
+          ))}
         </div>
 
-        {/* Metric Summary Comparison Table */}
-        <Panel
-          title="Comparator Performance Matrix"
-          subtitle="Evaluation across 48 synthetic outbreak events over a 24-month simulated operational cycle"
-          trailingAction={
-            <span className="text-xs text-canary-text-3 font-mono">
-              Run ID: {data.runId}
-            </span>
-          }
-        >
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs text-canary-text border-collapse">
-              <thead className="bg-panel-inset text-canary-text-3 uppercase tracking-wider text-[10px] border-b border-border">
-                <tr>
-                  <th className="py-3 px-4 font-semibold">Detection Methodology</th>
-                  <th className="py-3 px-4 font-semibold">Signal Streams Used</th>
-                  <th className="py-3 px-4 font-semibold text-right">Event Sensitivity</th>
-                  <th className="py-3 px-4 font-semibold text-right">Lead Time (Days)</th>
-                  <th className="py-3 px-4 font-semibold text-right">Alert PPV</th>
-                  <th className="py-3 px-4 font-semibold text-right">False Alerts / Site-Mo</th>
-                  <th className="py-3 px-4 font-semibold text-right">Ingest Latency</th>
-                </tr>
+        <Panel title="Detector comparison">
+          <div className="overflow-x-auto" tabIndex={0} role="region" aria-label="Detector comparison table">
+            <table className="w-full min-w-[520px] text-left text-sm tabular-nums">
+              <thead className="bg-panel-inset text-xs text-canary-text-2">
+                <tr>{['Detector', 'Events detected', 'Sensitivity', 'Precision', 'False alerts / site-month'].map((label) => <th key={label} scope="col" className="p-3">{label}</th>)}</tr>
               </thead>
-              <tbody className="divide-y divide-border/60">
-                {data.comparators.map((row) => (
-                  <tr
-                    key={row.methodId}
-                    className={`transition-colors ${
-                      row.isCanary
-                        ? 'bg-panel-raised border-l-4 border-l-canary-amber font-medium'
-                        : 'hover:bg-panel-raised'
-                    }`}
-                  >
-                    <td className="py-3.5 px-4">
-                      <div className="flex items-center gap-2">
-                        {row.isCanary && (
-                          <span className="w-2 h-2 rounded-full bg-canary-amber shadow-amber-glow" />
-                        )}
-                        <span className={row.isCanary ? 'font-bold text-canary-text' : 'text-canary-text-2'}>
-                          {row.methodName}
-                        </span>
-                      </div>
-                    </td>
-
-                    <td className="py-3.5 px-4 text-canary-text-3 text-[11px]">
-                      {row.signalsUsed}
-                    </td>
-
-                    <td className="py-3.5 px-4 text-right tabular-nums font-semibold">
-                      {(row.sensitivity * 100).toFixed(1)}%
-                    </td>
-
-                    <td
-                      className={`py-3.5 px-4 text-right tabular-nums font-semibold ${
-                        row.leadTimeDays > 0 ? 'text-[#7FB45A]' : 'text-[#F06B5E]'
-                      }`}
-                    >
-                      {row.leadTimeDays > 0 ? `+${row.leadTimeDays}` : row.leadTimeDays} days
-                    </td>
-
-                    <td className="py-3.5 px-4 text-right tabular-nums font-semibold">
-                      {(row.ppv * 100).toFixed(1)}%
-                    </td>
-
-                    <td className="py-3.5 px-4 text-right tabular-nums text-canary-text-2">
-                      {row.falseAlertsPerSiteMonth.toFixed(2)}
-                    </td>
-
-                    <td className="py-3.5 px-4 text-right tabular-nums text-canary-text-3 font-mono">
-                      {row.latencySeconds}s
-                    </td>
-                  </tr>
-                ))}
+              <tbody className="divide-y divide-border">
+                {comparatorIds.map((id) => {
+                  const result = report.comparators[id];
+                  return <tr key={id} className={id === 'canary' ? 'bg-panel-raised' : ''}>
+                    <th scope="row" className="p-3 font-bold">{names[id]}</th>
+                    <td className="p-3">{result.detected_events} / {result.events}</td>
+                    <td className="p-3">{percent(result.sensitivity)}</td>
+                    <td className="p-3">{percent(result.ppv)}</td>
+                    <td className="p-3">{result.false_alerts_per_unit_month.toFixed(3)}</td>
+                  </tr>;
+                })}
               </tbody>
             </table>
           </div>
         </Panel>
 
-        {/* Lead Time Comparison Bar Chart & Operational Takeaways */}
-        <div className="grid grid-cols-12 gap-6">
-          <div className="col-span-12 lg:col-span-7 flex flex-col">
-            <Panel
-              title="Operational Lead-Time Advantage"
-              subtitle="Days gained relative to clinical-significance threshold (0-day reference line)"
-            >
-              <div className="w-full h-64 canary-panel-inset p-3">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart
-                    data={leadTimeChartData}
-                    layout="vertical"
-                    margin={{ top: 10, right: 30, left: 40, bottom: 0 }}
-                  >
-                    <CartesianGrid stroke="#2C2C2E" strokeDasharray="3 3" horizontal={false} />
-                    <XAxis
-                      type="number"
-                      stroke="#8A857C"
-                      fontSize={11}
-                      tickFormatter={(v) => `${v > 0 ? `+${v}` : v}d`}
-                    />
-                    <YAxis
-                      dataKey="name"
-                      type="category"
-                      stroke="#8A857C"
-                      fontSize={11}
-                      tickLine={false}
-                    />
-                    <Tooltip
-                      content={({ active, payload }) => {
-                        if (active && payload && payload.length) {
-                          const p = payload[0].payload;
-                          return (
-                            <div className="bg-panel-raised border border-border p-2.5 rounded-control shadow-xl text-xs space-y-1">
-                              <span className="font-semibold text-canary-text">{p.name}</span>
-                              <div className="text-canary-amber font-medium">
-                                Lead Time: {p.leadTime > 0 ? `+${p.leadTime}` : p.leadTime} days
-                              </div>
-                            </div>
-                          );
-                        }
-                        return null;
-                      }}
-                    />
-                    <ReferenceLine x={0} stroke="#E5483D" strokeDasharray="3 3" />
-                    <Bar dataKey="leadTime" radius={[0, 4, 4, 0]}>
-                      {leadTimeChartData.map((entry, index) => (
-                        <Cell
-                          key={`cell-${index}`}
-                          fill={entry.isCanary ? '#F2A33A' : entry.leadTime > 0 ? '#6FA8C7' : '#8A857C'}
-                        />
-                      ))}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </Panel>
-          </div>
-
-          <div className="col-span-12 lg:col-span-5 flex flex-col">
-            <Panel
-              title="Methodological Explanations"
-              subtitle="Definitions and statistical thresholds applied in the validation harness"
-            >
-              <div className="space-y-3 text-xs text-canary-text-2">
-                <div className="canary-panel-inset p-3 space-y-1">
-                  <span className="font-semibold text-canary-text block">Event-Level Sensitivity:</span>
-                  <p className="text-canary-text-3 text-[11px] leading-relaxed">
-                    Percentage of injected synthetic outbreak windows detected by an alert before the outbreak peak. Canary achieves 91.8% sensitivity through early environmental hazard fusion.
-                  </p>
-                </div>
-
-                <div className="canary-panel-inset p-3 space-y-1">
-                  <span className="font-semibold text-canary-text block">Alert-Level PPV & False Alerts:</span>
-                  <p className="text-canary-text-3 text-[11px] leading-relaxed">
-                    Positive Predictive Value (86.4%) and False Alert rate (0.74 alerts per site-month) calibrated through 3-day persistence rules and deduplication to avoid operational fatigue.
-                  </p>
-                </div>
-              </div>
-            </Panel>
-          </div>
+        <div className="grid gap-6 lg:grid-cols-2">
+          <Panel title="When Canary alerts" subtitle="Median difference on events both methods detected">
+            <ul className="space-y-4">
+              {leadIds.map((id) => {
+                const lead = report.lead_time[id];
+                const direction = lead.median_days > 0 ? 'earlier' : 'later';
+                const days = Math.abs(lead.median_days);
+                return <li key={id} className="space-y-1.5">
+                  <div className="flex flex-wrap justify-between gap-x-2 text-sm">
+                    <span className="font-bold">{names[id]}</span>
+                    <span className="text-canary-text-2">{days ? `${days} ${days === 1 ? 'day' : 'days'} ${direction}` : 'Same day'} · {lead.paired_events} pairs</span>
+                  </div>
+                  <div className="relative h-2 rounded-full bg-panel-raised" aria-hidden="true">
+                    <span className="absolute inset-y-0 left-1/2 w-px bg-border-strong" />
+                    <span className={`absolute inset-y-0 rounded-full ${lead.median_days > 0 ? 'left-1/2 bg-status-ok' : 'right-1/2 bg-canary-amber'}`} style={{ width: `${Math.min(days / 3, 1) * 50}%` }} />
+                  </div>
+                </li>;
+              })}
+            </ul>
+          </Panel>
+          <Panel title="How to interpret the tradeoff">
+            <div className="space-y-3 text-sm leading-relaxed text-canary-text-2">
+              <p>Clinic CUSUM detected more events, especially gastrointestinal clusters. Canary produced fewer false alerts per site-month and had higher alert precision.</p>
+              <p>Fixed exposure thresholds can flag environmental conditions earlier. This comparator has no gastrointestinal rule.</p>
+              <p>Calibration seeds {report.calibration_seeds.join(', ')}. Held-out seeds {report.test_seeds.join(', ')}.</p>
+            </div>
+          </Panel>
         </div>
 
-        {/* Ablation & Robustness Grid (PRD Feature 12 & DESIGN.md Section 4.5) */}
-        <Panel
-          title="Ablation & Robustness Stress Tests"
-          subtitle="Systematic feed removal, reporting delays, and sensor noise degradation benchmarks"
-        >
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
-            {data.ablations.map((ab, i) => (
-              <div key={i} className="canary-panel-inset p-4 flex flex-col justify-between gap-3">
-                <div className="space-y-1.5">
-                  <h4 className="font-semibold text-canary-text text-xs">
-                    {ab.condition}
-                  </h4>
-                  <p className="text-[11px] text-canary-text-3 leading-relaxed">
-                    {ab.description}
-                  </p>
-                </div>
-
-                <div className="pt-2 border-t border-border/60 grid grid-cols-3 gap-2 text-center text-[11px]">
-                  <div className="bg-panel p-1.5 rounded">
-                    <span className="text-canary-text-3 block text-[10px]">Sensitivity</span>
-                    <span className="text-[#F06B5E] font-semibold tabular-nums">
-                      {(ab.sensitivityDrop * 100).toFixed(1)}%
-                    </span>
-                  </div>
-                  <div className="bg-panel p-1.5 rounded">
-                    <span className="text-canary-text-3 block text-[10px]">Lead Loss</span>
-                    <span className="text-[#F06B5E] font-semibold tabular-nums">
-                      {ab.leadTimeLossDays}d
-                    </span>
-                  </div>
-                  <div className="bg-panel p-1.5 rounded">
-                    <span className="text-canary-text-3 block text-[10px]">False +</span>
-                    <span className="text-[#B89A5B] font-semibold tabular-nums">
-                      +{ab.falseAlertIncrease}
-                    </span>
-                  </div>
-                </div>
-              </div>
+        <Panel title="Robustness under missing or noisy inputs" subtitle="Sensitivity measured on the same held-out simulation">
+          <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {conditionIds.map((id) => (
+              <li key={id} className="canary-panel-inset p-4">
+                <p className="text-sm font-bold">{conditions[id]}</p>
+                <p className="mt-2 text-sm tabular-nums text-canary-text-2">{percent(report.ablations[id].sensitivity)} sensitivity</p>
+              </li>
             ))}
-          </div>
+          </ul>
         </Panel>
       </div>
     </AppShell>
   );
 }
-

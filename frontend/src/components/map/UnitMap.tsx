@@ -60,7 +60,7 @@ export const UnitMap: React.FC<UnitMapProps> = ({
             onClick={() => setActiveLayer('all')}
             className={`px-2 py-0.5 rounded text-xs transition-colors ${
               activeLayer === 'all'
-                ? 'bg-canary-amber text-canvas-deep font-semibold'
+                ? 'bg-canary-amber text-canary-on-accent font-semibold'
                 : 'text-canary-text-2 hover:text-canary-text'
             }`}
           >

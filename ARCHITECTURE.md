@@ -550,7 +550,6 @@ canary/
 ├── README.md
 ├── PRD.md
 ├── ARCHITECTURE.md
-├── TASKS.md
 ├── MODEL_CARD.md
 ├── DATA_GOVERNANCE.md
 ├── ASSUMPTIONS.md

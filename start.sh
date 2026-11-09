@@ -42,6 +42,7 @@ BACKEND_PID=""
 FRONTEND_PID=""
 
 cleanup() {
+  local exit_status=$?
   # Avoid duplicate runs
   trap - SIGINT SIGTERM EXIT
   echo -e "\n${YELLOW}[Canary] Shutting down services...${NC}"
@@ -68,11 +69,13 @@ cleanup() {
   fi
 
   echo -e "${GREEN}[Canary] All services cleanly stopped. Goodbye!${NC}"
-  exit 0
+  exit "$exit_status"
 }
 
 # Trap termination signals
-trap cleanup SIGINT SIGTERM EXIT
+trap cleanup EXIT
+trap 'exit 130' SIGINT
+trap 'exit 143' SIGTERM
 
 echo -e "${BOLD}${CYAN}==================================================${NC}"
 echo -e "${BOLD}${CYAN}        Canary Surveillance Platform Launcher     ${NC}"
@@ -101,13 +104,13 @@ check_port "$FRONTEND_PORT" "Frontend"
 
 # 1. Determine backend launcher
 if command -v uv >/dev/null 2>&1; then
-  BACKEND_CMD="uv run uvicorn backend.app.api.main:app --host ${BACKEND_HOST} --port ${BACKEND_PORT} --reload"
+  BACKEND_CMD=(uv run uvicorn backend.app.api.main:app --host "$BACKEND_HOST" --port "$BACKEND_PORT" --reload)
 elif [ -d "$ROOT_DIR/.venv" ] && [ -f "$ROOT_DIR/.venv/bin/uvicorn" ]; then
-  BACKEND_CMD="$ROOT_DIR/.venv/bin/uvicorn backend.app.api.main:app --host ${BACKEND_HOST} --port ${BACKEND_PORT} --reload"
+  BACKEND_CMD=("$ROOT_DIR/.venv/bin/uvicorn" backend.app.api.main:app --host "$BACKEND_HOST" --port "$BACKEND_PORT" --reload)
 elif command -v uvicorn >/dev/null 2>&1; then
-  BACKEND_CMD="uvicorn backend.app.api.main:app --host ${BACKEND_HOST} --port ${BACKEND_PORT} --reload"
+  BACKEND_CMD=(uvicorn backend.app.api.main:app --host "$BACKEND_HOST" --port "$BACKEND_PORT" --reload)
 elif command -v python3 >/dev/null 2>&1; then
-  BACKEND_CMD="python3 -m uvicorn backend.app.api.main:app --host ${BACKEND_HOST} --port ${BACKEND_PORT} --reload"
+  BACKEND_CMD=(python3 -m uvicorn backend.app.api.main:app --host "$BACKEND_HOST" --port "$BACKEND_PORT" --reload)
 else
   echo -e "${RED}[Canary ERROR] Neither uv nor python3/uvicorn found. Please install uv (https://docs.astral.sh/uv/) or Python 3.12+.${NC}"
   exit 1
@@ -141,7 +144,7 @@ open_browser() {
 
 # 3. Start Backend
 echo -e "${CYAN}[Canary] Starting backend on ${BACKEND_URL}...${NC}"
-$BACKEND_CMD &
+"${BACKEND_CMD[@]}" &
 BACKEND_PID=$!
 echo -e "${GREEN}[Canary] Backend started with PID $BACKEND_PID${NC}"
 
@@ -149,7 +152,7 @@ echo -e "${GREEN}[Canary] Backend started with PID $BACKEND_PID${NC}"
 if [ -d "$FRONTEND_DIR" ]; then
   if [ ! -d "$FRONTEND_DIR/node_modules" ]; then
     echo -e "${YELLOW}[Canary] frontend/node_modules not found. Installing dependencies...${NC}"
-    (cd "$FRONTEND_DIR" && npm install)
+    (cd "$FRONTEND_DIR" && npm ci)
   fi
   echo -e "${CYAN}[Canary] Starting frontend on ${FRONTEND_URL}...${NC}"
   (cd "$FRONTEND_DIR" && npm run dev -- -p "$FRONTEND_PORT") &

@@ -15,8 +15,8 @@ export const CompletenessMeter: React.FC<CompletenessMeterProps> = ({
   className = '',
 }) => {
   const isStale = percentage < 80;
-  const barColor = isStale ? 'bg-[#B89A5B]' : 'bg-[#7FB45A]';
-  const textColor = isStale ? 'text-[#B89A5B]' : 'text-[#7FB45A]';
+  const barColor = isStale ? 'bg-status-stale' : 'bg-status-ok';
+  const textColor = isStale ? 'text-status-stale' : 'text-status-ok';
 
   const height = size === 'sm' ? 'h-1.5' : 'h-2';
 
@@ -30,7 +30,7 @@ export const CompletenessMeter: React.FC<CompletenessMeterProps> = ({
       </div>
       {showText && (
         <div className={`flex items-center gap-1 text-xs font-medium tabular-nums ${textColor}`}>
-          {isStale && <AlertTriangle className="w-3 h-3 text-[#B89A5B]" />}
+          {isStale && <AlertTriangle className="w-3 h-3 text-status-stale" />}
           <span>{percentage}%</span>
         </div>
       )}

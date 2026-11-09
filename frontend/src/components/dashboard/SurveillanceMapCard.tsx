@@ -23,29 +23,26 @@ export const SurveillanceMapCard: React.FC<SurveillanceMapCardProps> = ({
   const container = useRef<HTMLDivElement>(null);
   const previousView = useRef<{ center: LatLng; zoom: number } | null>(null);
   const [filter, setFilter] = useState('all');
-  const [theme, setTheme] = useState('dark');
+  const [mapStatus, setMapStatus] = useState<'loading' | 'ready' | 'unavailable'>('loading');
   const visible = DUBAI_PLACES.filter((place) => filter === 'all' ||
     (filter === 'critical' ? place.tier === 'ACTION' || place.tier === 'ALERT' : place.category === filter));
 
   useEffect(() => {
-    const update = () => setTheme(document.documentElement.classList.contains('light') ? 'light' : 'dark');
-    update();
-    const observer = new MutationObserver(update);
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
-    return () => observer.disconnect();
-  }, []);
-
-  useEffect(() => {
     let cancelled = false;
     let map: LeafletMap | null = null;
+    setMapStatus('loading');
     import('leaflet').then((L) => {
       if (cancelled || !container.current) return;
       map = L.map(container.current, { scrollWheelZoom: false, zoomControl: true });
 
-      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      }).addTo(map);
+      });
+      let loadedTile = false;
+      tiles.on('tileload', () => { loadedTile = true; if (!cancelled) setMapStatus('ready'); });
+      tiles.on('load', () => { if (!cancelled && !loadedTile) setMapStatus('unavailable'); });
+      tiles.addTo(map);
       if (previousView.current) map.setView(previousView.current.center, previousView.current.zoom);
       else map.fitBounds([[24.78, 55.02], [25.31, 56.16]], { padding: [22, 22] });
       for (const place of visible) {
@@ -60,12 +57,12 @@ export const SurveillanceMapCard: React.FC<SurveillanceMapCardProps> = ({
           onSelectUnit?.(placeToMonitoringUnit(place));
         });
       }
-    });
+    }).catch(() => { if (!cancelled) setMapStatus('unavailable'); });
     return () => {
       cancelled = true;
       if (map) { previousView.current = { center: map.getCenter(), zoom: map.getZoom() }; map.remove(); }
     };
-  }, [filter, theme, selectedPlaceId, selectedUnitId, onSelectPlace, onSelectUnit]);
+  }, [filter, selectedPlaceId, selectedUnitId, onSelectPlace, onSelectUnit]);
 
   return (
     <div className="canary-panel overflow-hidden flex flex-col h-full">
@@ -87,7 +84,30 @@ export const SurveillanceMapCard: React.FC<SurveillanceMapCardProps> = ({
           </select>
         </label>
       </div>
-      <div ref={container} className="h-[430px] sm:h-[500px] w-full bg-panel-inset z-0" aria-label="Interactive map of illustrative surveillance areas in Dubai and Hatta" />
+      <div className="relative">
+        <div ref={container} className="h-[360px] sm:h-[485px] w-full bg-panel-inset z-0" aria-label="Interactive map of illustrative surveillance areas in Dubai and Hatta" />
+        {mapStatus !== 'ready' && (
+          <p role="status" className="pointer-events-none absolute bottom-7 left-3 z-10 rounded-lg border border-border bg-panel px-2.5 py-1.5 text-xs font-semibold text-canary-text-2">
+            {mapStatus === 'loading' ? 'Loading base map…' : 'Base map unavailable. Use the area selector below.'}
+          </p>
+        )}
+      </div>
+      {onSelectPlace && (
+        <label className="flex items-center gap-2 border-t border-border px-5 py-2 text-xs font-semibold text-canary-text-2">
+          Inspect area
+          <select
+            value={visible.some(({ id }) => id === selectedPlaceId) ? selectedPlaceId ?? '' : ''}
+            onChange={(event) => {
+              const place = visible.find(({ id }) => id === event.target.value);
+              if (place) onSelectPlace(place);
+            }}
+            className="min-w-0 flex-1 rounded-lg border border-border-strong bg-panel-inset px-2 py-2 text-canary-text"
+          >
+            <option value="" disabled>Select a monitoring area</option>
+            {visible.map(({ id, name }) => <option key={id} value={id}>{name}</option>)}
+          </select>
+        </label>
+      )}
       <div className="px-5 py-3 flex flex-wrap gap-x-5 gap-y-2 text-xs text-canary-text-2 border-t border-border">
         {Object.entries(colors).map(([tier, color]) => <span key={tier} className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: color }} />{tier.charAt(0) + tier.slice(1).toLowerCase()}</span>)}
         <span className="ml-auto">Select a marker for the area dossier</span>

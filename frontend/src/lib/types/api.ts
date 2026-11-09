@@ -29,38 +29,6 @@ export interface AlertsListResponse {
   unacknowledgedActionCount: number;
 }
 
-export interface BacktestComparatorRow {
-  methodId: string;
-  methodName: string;
-  signalsUsed: string;
-  isCanary?: boolean;
-  sensitivity: number; // e.g. 0.912
-  leadTimeDays: number; // e.g. +2.8 days
-  ppv: number; // e.g. 0.845
-  falseAlertsPerSiteMonth: number; // e.g. 0.72
-  latencySeconds: number; // e.g. 1.4s
-}
-
-export interface AblationResult {
-  condition: string;
-  description: string;
-  sensitivityDrop: number;
-  leadTimeLossDays: number;
-  falseAlertIncrease: number;
-}
-
-export interface BacktestSummaryResponse {
-  runId: string;
-  calibrationSeed: number;
-  testSeed: number;
-  testedScenariosCount: number;
-  syntheticEventCount: number;
-  comparators: BacktestComparatorRow[];
-  ablations: AblationResult[];
-  datasetDateRange: string;
-  isSyntheticEvaluated: true;
-}
-
 export interface ReplayDayState {
   dayNumber: number;
   calendarDate: string;

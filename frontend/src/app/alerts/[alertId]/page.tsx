@@ -48,17 +48,22 @@ export default function AlertDetailPage() {
   const [alert, setAlert] = useState<AlertDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedWindow, setSelectedWindow] = useState<'1d' | '3d' | '7d'>('3d');
   const [activeStreamIndex, setActiveStreamIndex] = useState(0);
   const [signOffModalOpen, setSignOffModalOpen] = useState(false);
+  const [reviewPending, setReviewPending] = useState(false);
+  const [reviewFailed, setReviewFailed] = useState(false);
 
   useEffect(() => {
     if (!alertId) return;
+    const request = new AbortController();
+    setActiveStreamIndex(0);
+    setSignOffModalOpen(false);
     setLoading(true);
     setError(null);
 
-    fetchAlertById(alertId, activeRole)
+    fetchAlertById(alertId, activeRole, request.signal)
       .then((data) => {
+        if (request.signal.aborted) return;
         setAlert(data);
         setLoading(false);
 
@@ -66,22 +71,22 @@ export default function AlertDetailPage() {
         recordAuditEvent({
           actorRole: activeRole,
           eventType: 'VIEW_ALERT',
-          resourceType: 'alert_detail',
           resourceId: alertId,
-          details: `Viewed alert detail for ${data.title} (${data.unit.name}).`,
         });
       })
       .catch((err) => {
+        if (request.signal.aborted) return;
         console.error('Failed to load alert detail:', err);
         setError(err.message || 'Could not load alert');
         setLoading(false);
       });
+    return () => request.abort();
   }, [alertId, activeRole]);
 
   if (loading) {
     return (
       <AppShell
-        title="ALERT DETAIL"
+        title="Alert detail"
         description="Multi-signal explainability breakdown and proportionate response playbooks."
       >
         <div className="py-16 flex flex-col items-center justify-center gap-4">
@@ -95,11 +100,11 @@ export default function AlertDetailPage() {
   if (error || !alert) {
     return (
       <AppShell
-        title="ALERT DETAIL"
+        title="Alert detail"
         description="Multi-signal explainability breakdown and proportionate response playbooks."
       >
         <div className="canary-panel p-8 text-center max-w-lg mx-auto flex flex-col items-center gap-4">
-          <AlertTriangle className="w-10 h-10 text-[#F06B5E]" />
+          <AlertTriangle className="w-10 h-10 text-tier-action-text" />
           <h2 className="text-base font-semibold text-canary-text">Unable to View Alert</h2>
           <p className="text-xs text-canary-text-2">{error || 'Alert not found.'}</p>
           <Link
@@ -117,7 +122,7 @@ export default function AlertDetailPage() {
 
   return (
     <AppShell
-      title={`ALERT: ${alert.id}`}
+      title={`Alert ${alert.id}`}
       description="Sense emerging population and workforce health risk through transparent multi-signal evidence."
     >
       <div className="flex flex-col gap-6">
@@ -166,13 +171,17 @@ export default function AlertDetailPage() {
 
           {/* Top-Right Review Action Button */}
           <div className="flex flex-col items-end gap-2 flex-shrink-0 self-start md:self-center">
-            <button
-              onClick={() => setSignOffModalOpen(true)}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-control bg-canary-amber hover:bg-canary-amber/90 text-canvas-deep font-bold text-xs shadow-amber-glow transition-all"
-            >
-              <UserCheck className="w-4 h-4" />
-              <span>Review and Sign Off</span>
-            </button>
+            {isRegulator ? (
+              <span className="rounded-control border border-border px-3 py-2 text-xs font-semibold text-canary-text-2">Compliance view</span>
+            ) : (
+              <button
+                onClick={() => { setReviewFailed(false); setSignOffModalOpen(true); }}
+                className="flex items-center gap-2 px-5 py-2.5 rounded-control bg-canary-amber hover:bg-canary-amber/90 text-canvas-deep font-bold text-xs shadow-amber-glow transition-all"
+              >
+                <UserCheck className="w-4 h-4" />
+                <span>Review and Sign Off</span>
+              </button>
+            )}
             <span className="text-[10px] text-canary-text-3 italic">
               Decision support · Requires human review
             </span>
@@ -207,11 +216,11 @@ export default function AlertDetailPage() {
               }
             >
               <div className="space-y-4">
-                <div className="flex items-center justify-between text-xs text-canary-text-3">
+                <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-canary-text-3">
                   <span className="font-semibold text-canary-text">
                     {activeStream?.streamName} ({activeStream?.unit})
                   </span>
-                  <div className="flex items-center gap-3">
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
                     <span className="flex items-center gap-1">
                       <span className="w-2.5 h-0.5 bg-[#F2A33A]" /> Observed
                     </span>
@@ -322,7 +331,7 @@ export default function AlertDetailPage() {
                 {/* Persistence Rule Status Banner */}
                 <div className="p-3 rounded-control bg-panel-inset border border-border flex items-center justify-between text-xs">
                   <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-[#7FB45A]" />
+                    <CheckCircle2 className="w-4 h-4 text-status-ok" />
                     <span className="font-medium text-canary-text">
                       Persistence Requirement Met
                     </span>
@@ -366,10 +375,10 @@ export default function AlertDetailPage() {
                       {/* Correlation discount or cap notes */}
                       <div className="flex items-center gap-2 text-[10px] text-canary-text-3">
                         {c.capped && (
-                          <span className="text-[#E8C14A]">• Evidence contribution capped at safety limit</span>
+                          <span className="text-tier-watch-text">• Evidence contribution capped at safety limit</span>
                         )}
                         {c.correlationDiscountApplied && (
-                          <span className="text-[#6FA8C7]">• Correlation discount applied (avoids double-counting)</span>
+                          <span className="text-prov-real">• Correlation discount applied (avoids double-counting)</span>
                         )}
                       </div>
                     </div>
@@ -384,23 +393,6 @@ export default function AlertDetailPage() {
             <Panel
               title="3. Where and When"
               subtitle="Geographic cluster zone, time window, and temporal onset"
-              trailingAction={
-                <div className="flex items-center gap-1 bg-panel-inset p-1 rounded-control border border-border">
-                  {(['1d', '3d', '7d'] as const).map((w) => (
-                    <button
-                      key={w}
-                      onClick={() => setSelectedWindow(w)}
-                      className={`px-2 py-0.5 rounded text-xs font-medium transition-colors ${
-                        selectedWindow === w
-                          ? 'bg-panel-raised text-canary-amber font-semibold'
-                          : 'text-canary-text-3 hover:text-canary-text'
-                      }`}
-                    >
-                      {w.toUpperCase()} Window
-                    </button>
-                  ))}
-                </div>
-              }
             >
               <div className="space-y-4 text-xs">
                 <div className="grid grid-cols-2 gap-3">
@@ -419,7 +411,6 @@ export default function AlertDetailPage() {
                     <span className="font-semibold text-canary-text block">
                       {alert.window.start} → {alert.window.end}
                     </span>
-                    <span className="text-canary-text-3 text-[11px]">Selected: {selectedWindow} active slice</span>
                   </div>
                 </div>
 
@@ -428,7 +419,7 @@ export default function AlertDetailPage() {
                     Spatial Zone Analysis:
                   </span>
                   <p className="text-canary-text-2 text-xs leading-relaxed">
-                    Evaluated as a high-density worker residential node connected to Musaffah industrial fabrication yards. Poisson space-time scan indicates cluster concentration is localized within shared accommodation blocks with secondary spread into connected day shifts.
+                    This example covers the monitoring unit and date range shown above. Open the surveillance map to see the wider monitoring area.
                   </p>
                 </div>
               </div>
@@ -452,7 +443,7 @@ export default function AlertDetailPage() {
 
                   <div className="canary-panel-inset p-3 space-y-1">
                     <span className="text-canary-text-3 font-medium">Model Uncertainty</span>
-                    <div className="flex items-center gap-1.5 mt-1 font-semibold capitalize text-[#7FB45A]">
+                    <div className="flex items-center gap-1.5 mt-1 font-semibold capitalize text-status-ok">
                       <CheckCircle2 className="w-4 h-4" />
                       <span>{alert.uncertaintyScore} Uncertainty</span>
                     </div>
@@ -463,14 +454,14 @@ export default function AlertDetailPage() {
                   <span className="font-semibold text-canary-text block">Feed Ingestion Auditing:</span>
                   <div className="flex items-center justify-between text-canary-text-2">
                     <span>Environmental Observations:</span>
-                    <span className="text-[#7FB45A] font-medium">Hourly CAMS sync (Fresh)</span>
+                    <span className="text-status-ok font-medium">Hourly CAMS sync (Fresh)</span>
                   </div>
                   <div className="flex items-center justify-between text-canary-text-2">
                     <span>Clinical Outcomes:</span>
                     <span className="text-canary-text font-medium">Daily batch aggregate (Normal)</span>
                   </div>
                   {alert.missingStreams.length > 0 ? (
-                    <div className="text-[#B89A5B] bg-[#B89A5B]/10 p-2 rounded border border-[#B89A5B]/20">
+                    <div className="text-status-stale bg-[#B89A5B]/10 p-2 rounded border border-[#B89A5B]/20">
                       ⚠ Note: {alert.missingStreams.join(', ')} omitted from score to prevent false confidence.
                     </div>
                   ) : (
@@ -576,7 +567,7 @@ export default function AlertDetailPage() {
                     )}
                   </div>
 
-                  <div className="p-2 rounded bg-panel border border-border text-[11px] text-[#EDCB63] font-medium">
+                  <div className="p-2 rounded bg-panel border border-border text-[11px] text-tier-watch-text font-medium">
                     ⚠️ Decision Support Only: Requires human physician/HSE officer sign-off.
                   </div>
                 </div>
@@ -604,13 +595,14 @@ export default function AlertDetailPage() {
               <div>Current Demo Role: <strong className="text-canary-amber">{activeRole}</strong></div>
             </div>
 
-            <div className="p-3 rounded bg-[#B89A5B]/15 border border-[#B89A5B]/30 text-xs text-[#EDCB63] flex items-start gap-2">
+            <div className="p-3 rounded bg-[#B89A5B]/15 border border-[#B89A5B]/30 text-xs text-tier-watch-text flex items-start gap-2">
               <Lock className="w-4 h-4 flex-shrink-0 mt-0.5" />
               <span>
                 Demonstration Notice: Demo roles operate in read-only audit mode. State changes are preserved in the session audit log without executing production dispatch.
               </span>
             </div>
 
+            {reviewFailed && <p role="alert" className="text-xs text-tier-action-text">The demo review could not be recorded. Try again.</p>}
             <div className="flex items-center justify-end gap-2 pt-2">
               <button
                 onClick={() => setSignOffModalOpen(false)}
@@ -619,18 +611,24 @@ export default function AlertDetailPage() {
                 Cancel
               </button>
               <button
-                onClick={() => {
-                  recordAuditEvent({
+                disabled={reviewPending}
+                onClick={async () => {
+                  setReviewPending(true);
+                  setReviewFailed(false);
+                  const recorded = await recordAuditEvent({
                     actorRole: activeRole,
                     eventType: 'SIGN_OFF_ATTEMPT',
-                    resourceType: 'alert_action',
                     resourceId: alert.id,
-                    details: `Signed off on response playbook for ${alert.title}.`,
                   });
+                  setReviewPending(false);
+                  if (!recorded) {
+                    setReviewFailed(true);
+                    return;
+                  }
                   setSignOffModalOpen(false);
-                  alert.status = 'under_review';
+                  setAlert((current) => current?.id === alert.id ? { ...current, status: 'under_review' } : current);
                 }}
-                className="px-4 py-2 rounded-control bg-canary-amber text-canvas-deep font-semibold text-xs shadow-amber-glow"
+                className="px-4 py-2 rounded-control bg-canary-amber text-canary-on-accent font-semibold text-xs shadow-amber-glow"
               >
                 Confirm Review & Record Audit
               </button>

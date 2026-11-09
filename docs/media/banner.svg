@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="460" viewBox="0 0 1440 460" role="img" aria-labelledby="title">
+  <title id="title">Canary. See the signal. Act sooner.</title>
+  <defs>
+    <linearGradient id="bg" x2="1" y2="1" gradientUnits="objectBoundingBox">
+      <stop stop-color="#172239"/><stop offset="1" stop-color="#415579"/>
+    </linearGradient>
+    <radialGradient id="halo"><stop stop-color="#9bdbff" stop-opacity=".65"/><stop offset="1" stop-color="#9bdbff" stop-opacity="0"/></radialGradient>
+    <pattern id="grid" width="36" height="36" patternUnits="userSpaceOnUse"><path d="M36 0H0V36" fill="none" stroke="#d4e4ff" stroke-opacity=".07"/></pattern>
+  </defs>
+  <rect width="1440" height="460" rx="26" fill="url(#bg)"/>
+  <rect width="1440" height="460" rx="26" fill="url(#grid)"/>
+  <g fill="none" stroke="#9bb8dc" stroke-opacity=".31">
+    <circle cx="1110" cy="240" r="92"/><circle cx="1110" cy="240" r="136"/><circle cx="1110" cy="240" r="181"/>
+    <path d="m850 260 84-75 81 29 95 26 80-73 121 56 60-69M1015 214l38 103 57-77 83 66 118-83"/>
+  </g>
+  <g fill="url(#halo)">
+    <circle cx="934" cy="185" r="25"/><circle cx="1015" cy="214" r="31"/><circle cx="1110" cy="240" r="47"/><circle cx="1190" cy="167" r="27"/><circle cx="1311" cy="223" r="26"/>
+  </g>
+  <g fill="#d6efff">
+    <circle cx="850" cy="260" r="3"/><circle cx="934" cy="185" r="4"/><circle cx="1015" cy="214" r="5"/><circle cx="1053" cy="317" r="3"/><circle cx="1110" cy="240" r="8"/><circle cx="1190" cy="167" r="4"/><circle cx="1193" cy="306" r="3"/><circle cx="1311" cy="223" r="4"/><circle cx="1371" cy="154" r="3"/>
+  </g>
+  <text x="76" y="96" fill="#f5c77a" font-family="Arial,sans-serif" font-size="18" font-weight="700" letter-spacing="4">CANARY / CHALLENGE 06</text>
+  <g font-family="Georgia,serif" font-size="83" fill="#f5f6f3">
+    <text x="72" y="213">See the signal.</text>
+    <text x="72" y="303" fill="#cde5ff" font-style="italic">Act sooner.</text>
+  </g>
+  <path d="M76 351H736" stroke="#d1e2f7" stroke-opacity=".3"/>
+  <text x="76" y="392" fill="#d1e2f7" font-family="Arial,sans-serif" font-size="19" letter-spacing="1">EARLY WARNING FOR POPULATION AND WORKFORCE HEALTH</text>
+</svg>

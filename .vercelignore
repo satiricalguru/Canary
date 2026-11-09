@@ -1,9 +1,8 @@
 # Ignore non-frontend files from Vercel deployment
 backend/
 fixtures/
+docs/media/
 eval/
-ideas/
-scroll_animation_frames/
 var/
 .venv/
 .pytest_cache/

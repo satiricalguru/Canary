@@ -1,170 +1,99 @@
-@import "tailwindcss/base";
-@import "tailwindcss/components";
-@import "tailwindcss/utilities";
-
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&family=Alex+Brush&family=Pinyon+Script&family=Cormorant+Garamond:ital,wght@1,400;1,500;1,600;1,700&family=Playfair+Display:ital,wght@1,400;1,600;1,700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
-  /* Surfaces */
-  --canvas:        #121213;  /* page background */
-  --canvas-deep:   #0D0D0E;  /* header band, map ocean */
-  --panel:         #1B1B1C;  /* default panel */
-  --panel-raised:  #232324;  /* hover, selected row, popover */
-  --panel-inset:   #161617;  /* wells inside panels, chart plots */
-  --border:        #2C2C2E;  /* panel and divider lines */
-  --border-strong: #3A3A3D;  /* inputs, focus-adjacent */
-  --highlight:     rgba(255, 255, 255, 0.04); /* 1px top inner edge on panels */
-
-  /* Text */
-  --text:          #EDE8DF;  /* primary, warm off-white */
-  --text-2:        #B3AEA4;  /* secondary */
-  --text-3:        #8A857C;  /* tertiary, non-essential only */
-
-  /* Brand / signal light */
-  --amber:         #F2A33A;  /* primary accent, links, focus ring, active nav */
-  --amber-glow:    rgba(242, 163, 58, 0.35);
-
-  /* Risk tiers (always paired with shape + label) */
-  --tier-watch:    #E8C14A;  /* gold */
-  --tier-alert:    #F08A2E;  /* orange */
-  --tier-action:   #E5483D;  /* red */
-  --tier-watch-text:  #EDCB63;
-  --tier-alert-text:  #F59A4A;
-  --tier-action-text: #F06B5E; /* lighter red for text, passes 4.5:1 */
-
-  /* Status */
-  --ok:            #7FB45A;  /* complete, within expected range, improving */
-  --stale:         #B89A5B;  /* delayed or stale feed */
-  --missing:       #6F6B64;  /* no data (rendered hatched, never filled) */
-  --info:          #6FA8C7;  /* real environmental series */
-
-  /* Provenance */
-  --prov-real:     #6FA8C7;  /* real data */
-  --prov-sim:      #C58BD9;  /* simulated data */
-  --prov-illus:    #D9B26F;  /* illustrative estimate */
-}
-
-body {
-  background-color: var(--canvas);
-  color: var(--text);
-  font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  min-height: 100vh;
-  overflow-x: hidden;
-}
-
-/* Tabular numbers across all metric displays */
-.tabular-nums {
-  font-variant-numeric: tabular-nums;
-}
-
-/* Calligraphic and cursive stylish typography matching Canary logo */
-.font-cursive-stylish {
-  font-family: 'Alex Brush', 'Pinyon Script', 'Cormorant Garamond', cursive;
-  font-style: normal;
-}
-
-.font-script-flourish {
-  font-family: 'Alex Brush', 'Pinyon Script', cursive;
-}
-
-/* Panel base elevation styling */
-.canary-panel {
-  background-color: var(--panel);
-  border: 1px solid var(--border);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35), inset 0 1px 0 var(--highlight);
-  border-radius: 14px;
-}
-
-.canary-panel-inset {
-  background-color: var(--panel-inset);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-}
-
-/* Diagonal hatch for suppressed and missing cells */
-.hatched-suppressed {
-  background-color: var(--panel-inset);
-  background-image: repeating-linear-gradient(
-    45deg,
-    transparent,
-    transparent 6px,
-    rgba(255, 255, 255, 0.04) 6px,
-    rgba(255, 255, 255, 0.04) 12px
-  );
-}
-
-.hatched-simulated {
-  background-image: repeating-linear-gradient(
-    -45deg,
-    transparent,
-    transparent 4px,
-    rgba(197, 139, 217, 0.15) 4px,
-    rgba(197, 139, 217, 0.15) 8px
-  );
-}
-
-/* Topographic contour header background pattern */
-.topo-pattern {
-  background-image: radial-gradient(circle at 80% 20%, rgba(242, 163, 58, 0.06) 0%, transparent 60%),
-    linear-gradient(to bottom, rgba(13, 13, 14, 0.95), rgba(18, 18, 19, 1));
-}
-
-/* Custom sleek dark scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  background: var(--canvas-deep);
-}
-::-webkit-scrollbar-thumb {
-  background: var(--border-strong);
-  border-radius: 3px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: var(--amber);
-}
-
-/* Focus outline */
-*:focus-visible {
-  outline: 2px solid var(--amber);
-  outline-offset: 2px;
-}
-
-
-html.light {
   color-scheme: light;
-  --canvas: #f3f5f3;
-  --canvas-deep: #e9eeeb;
-  --panel: #ffffff;
-  --panel-raised: #edf3ef;
-  --panel-inset: #f3f6f3;
-  --border: #d5ded8;
-  --border-strong: #bac9bf;
-  --highlight: rgba(255,255,255,.8);
-  --text: #192d26;
-  --text-2: #455c50;
-  --text-3: #62766b;
-  --amber: #99600b;
-  --tier-watch-text: #82620b;
-  --tier-alert-text: #ad510b;
-  --tier-action-text: #ba3028;
-  --ok: #397d47;
-  --info: #346c8d;
-  --prov-real: #346c8d;
-  --prov-sim: #824c95;
-  --prov-illus: #8d631e;
+  --font-ui: 'Manrope Variable', Manrope, system-ui, sans-serif;
+  --font-display: 'Newsreader Variable', Newsreader, Georgia, serif;
+  --canvas: #f5f6f3;
+  --canvas-deep: #e9edf1;
+  --panel: #fcfcfa;
+  --panel-raised: #e6ebf2;
+  --panel-inset: #f0f2f4;
+  --border: #d9dfe5;
+  --border-strong: #a7b1c2;
+  --text: #2f3a55;
+  --text-2: #5c6b8a;
+  --text-3: #5e6a80;
+  --amber: #3e5279;
+  --on-accent: #fff;
+  --amber-glow: #5c6b8a32;
+  --tier-watch: #a37a18;
+  --tier-alert: #bc5418;
+  --tier-action: #b93c3a;
+  --tier-watch-text: #76580f;
+  --tier-alert-text: #994117;
+  --tier-action-text: #a33132;
+  --ok: #28694e;
+  --stale: #816522;
+  --missing: #6f7480;
+  --info: #2d6686;
+  --prov-real: #2d6686;
+  --prov-sim: #754d8a;
+  --prov-illus: #7d601c;
+  --focus: #3e609b;
+  --panel-shadow: 0 4px 18px rgb(47 58 85 / 4%);
 }
-html.light .topo-pattern { background-image: radial-gradient(circle at 80% 20%, rgba(242,163,58,.1), transparent 60%), linear-gradient(#edf2ee, #f3f5f3); }
-html.light .canary-panel { box-shadow: 0 8px 24px rgba(30,60,40,.08); }
-html.light .bg-\[\#1B1B1D\], html.light .bg-\[\#0E0F12\] { background-color: var(--panel); }
+
+html.dark {
+  color-scheme: dark;
+  --canvas: #161d2b;
+  --canvas-deep: #192235;
+  --panel: #202a3d;
+  --panel-raised: #303e57;
+  --panel-inset: #1b2537;
+  --border: #36445c;
+  --border-strong: #576682;
+  --text: #edf0f7;
+  --text-2: #c2cbe0;
+  --text-3: #a7b2c9;
+  --amber: #bacaf2;
+  --on-accent: #182238;
+  --amber-glow: #a9bde732;
+  --tier-watch: #e8c14a;
+  --tier-alert: #f1a46a;
+  --tier-action: #e87470;
+  --tier-watch-text: #f4d671;
+  --tier-alert-text: #f8ac70;
+  --tier-action-text: #ffa39b;
+  --ok: #91c7a4;
+  --stale: #dbc180;
+  --missing: #b1b8c7;
+  --info: #9acbe5;
+  --prov-real: #9acbe5;
+  --prov-sim: #d5ace9;
+  --prov-illus: #e5c889;
+  --focus: #c2d5ff;
+  --panel-shadow: 0 4px 18px rgb(0 0 0 / 12%);
+}
+
+body { min-height: 100vh; font-family: var(--font-ui); background: var(--canvas); color: var(--text); }
+.font-editorial-serif, .font-editorial-italic { font-family: var(--font-display); }
+.font-editorial-italic { font-style: italic; }
+::selection { background: #d4dfef; color: #222f49; }
+:where(a, button, select, input, textarea, summary, [tabindex]):focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+.canary-skip { position: fixed; z-index: 9999; top: 12px; left: 12px; transform: translateY(-150%); padding: 12px 20px; background: #2f3a55; color: white; border-radius: 10px; }
+.canary-skip:focus { transform: none; }
+.canary-panel { min-width: 0; background: var(--panel); border: 1px solid var(--border); border-radius: 20px; box-shadow: var(--panel-shadow); }
+.canary-panel-inset { background: var(--panel-inset); border: 1px solid var(--border); border-radius: 12px; }
+.hatched-suppressed, .hatched-missing {
+  background-color: var(--panel-inset);
+  background-image: repeating-linear-gradient(45deg, transparent 0 6px, color-mix(in srgb, var(--missing) 16%, transparent) 6px 12px);
+}
+.hatched-missing { background-image: repeating-linear-gradient(-45deg, transparent 0 4px, color-mix(in srgb, var(--missing) 22%, transparent) 4px 8px); }
 .canary-map-marker { background: transparent; border: 0; }
 .canary-map-marker span { display: block; width: 16px; height: 16px; margin: 4px; background: var(--marker-color); border: 2px solid white; border-radius: 50%; box-shadow: 0 1px 7px #0009; }
 .canary-map-marker span.selected { outline: 3px solid var(--marker-color); outline-offset: 3px; }
-/* The flight animation uses a dark video backdrop in both themes. */
-html.light #flight-story { --text: #ede8df; --text-2: #d4cfc5; --text-3: #bcb6ac; --amber: #f2a33a; }
-html.light .bg-\[\#1A1608\] { background-color: #fff5db; color: #76510c; }
-
-html.light .from-\[\#1A1A1C\] { background-image: none; background-color: var(--panel); border-color: var(--border); box-shadow: 0 8px 24px rgba(30,60,40,.08); }
-html.light .bg-black\/20, html.light .bg-black\/30, html.light .bg-black\/40 { background-color: var(--panel-inset); }
-html.dark .leaflet-tile-pane { filter: brightness(.68) saturate(.72); }
+.canary-wordmark { display: inline-flex; align-items: center; gap: 10px; font-family: var(--font-display); font-size: 33px; font-weight: 600; line-height: 1; letter-spacing: -.065em; white-space: nowrap; }
+.canary-wordmark > img { width: 38px; height: 38px; }
+.canary-wordmark > span { margin-top: 6px; }
+.wordmark-period { opacity: .54; }
+.landing { --focus: #3e609b; }
+.hero-film, .landing-close { --focus: #c2d5ff; }
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-ping, .animate-pulse, .animate-bounce { animation: none !important; }
+}

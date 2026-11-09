@@ -33,13 +33,10 @@ export const RoleProvider: React.FC<{ children: React.ReactNode }> = ({ children
     document.cookie = `canary_role=${newRole}; path=/; max-age=86400`;
 
     // Record audit event for role change
-    const targetRole = DEMO_ROLES.find((r) => r.id === newRole);
     recordAuditEvent({
       actorRole: newRole,
       eventType: 'ROLE_SWITCH',
-      resourceType: 'system_auth',
       resourceId: `session_${newRole}`,
-      details: `Switched demo role to: ${targetRole?.title}. Server-side permissions refreshed.`,
     });
   };
 

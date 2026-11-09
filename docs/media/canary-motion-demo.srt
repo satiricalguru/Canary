@@ -1,0 +1,238 @@
+1
+00:00:00,390 --> 00:00:05,159
+What if the first signs of a health event
+were already there, scattered across
+
+2
+00:00:05,219 --> 00:00:05,992
+different systems?
+
+3
+00:00:06,052 --> 00:00:11,153
+A dust spike, more clinic visits, and a
+change in sick leave can tell a
+
+4
+00:00:11,213 --> 00:00:13,651
+different story when teams see them
+together.
+
+5
+00:00:13,711 --> 00:00:17,814
+Canary brings those signals into one early
+warning workspace for population and
+
+6
+00:00:17,874 --> 00:00:18,647
+workforce health.
+
+7
+00:00:20,057 --> 00:00:21,894
+Start in the surveillance room.
+
+8
+00:00:21,954 --> 00:00:26,206
+The Dubai map shows illustrative
+monitoring areas and their current risk
+tiers.
+
+9
+00:00:26,266 --> 00:00:30,862
+Select an area to see the main signal,
+data completeness, and a suggested
+
+10
+00:00:30,922 --> 00:00:31,380
+response.
+
+11
+00:00:31,440 --> 00:00:36,036
+The wider surveillance map lets teams
+narrow their view to a district and
+
+12
+00:00:36,096 --> 00:00:39,313
+inspect the monitoring units available to
+their demo role.
+
+13
+00:00:40,723 --> 00:00:43,234
+Now replay a simulated respiratory
+episode.
+
+14
+00:00:43,294 --> 00:00:47,387
+Scrub the timeline as environmental
+exposure and aggregate outcomes change.
+
+15
+00:00:47,447 --> 00:00:52,332
+The different detector tracks show when
+each method would flag the event.
+
+16
+00:00:52,392 --> 00:00:56,485
+The same workspace also supports
+gastrointestinal and heat stress
+scenarios.
+
+17
+00:00:56,545 --> 00:01:01,429
+The scenarios are simulated so teams can
+inspect the decisions without using
+
+18
+00:01:01,489 --> 00:01:02,813
+personal health records.
+
+19
+00:01:04,223 --> 00:01:06,719
+Open an alert to see what changed.
+
+20
+00:01:06,779 --> 00:01:10,297
+Compare observations with the expected
+baseline, then inspect the evidence
+
+21
+00:01:10,357 --> 00:01:13,193
+contribution chart to see what drove the
+tier.
+
+22
+00:01:13,253 --> 00:01:18,134
+The alert describes the area and time
+window and shows how complete the feeds
+
+23
+00:01:18,194 --> 00:01:18,645
+were.
+
+24
+00:01:18,705 --> 00:01:22,563
+When the evidence is incomplete, that
+uncertainty belongs in the decision.
+
+25
+00:01:23,973 --> 00:01:26,178
+An alert leads to a playbook.
+
+26
+00:01:26,238 --> 00:01:30,882
+The reviewer can see the proposed action,
+who should review it, the evidence
+
+27
+00:01:30,942 --> 00:01:33,496
+behind it, and the assumptions that
+matter.
+
+28
+00:01:33,556 --> 00:01:35,412
+Canary supports a human review.
+
+29
+00:01:35,472 --> 00:01:39,071
+The impact estimator lets teams explore
+how uptake and intervention
+
+30
+00:01:39,131 --> 00:01:42,730
+effectiveness change the projected
+outcome, using assumptions they can
+adjust.
+
+31
+00:01:44,140 --> 00:01:46,387
+Privacy is part of the workflow.
+
+32
+00:01:46,447 --> 00:01:49,758
+The ingest sandbox accepts aggregate
+records and rejects person-level
+
+33
+00:01:49,818 --> 00:01:50,290
+identifiers.
+
+34
+00:01:50,350 --> 00:01:55,081
+In the suppression demo, change the
+threshold to see how small counts and
+
+35
+00:01:55,141 --> 00:01:56,678
+related totals are hidden.
+
+36
+00:01:56,738 --> 00:02:01,114
+The role selector shows how the same
+workspace changes with the reviewer’s
+
+37
+00:02:01,174 --> 00:02:01,647
+scope.
+
+38
+00:02:03,057 --> 00:02:05,109
+How well does it work?
+
+39
+00:02:05,169 --> 00:02:09,527
+Across one hundred and forty-four injected
+events on held-out simulation seeds,
+
+40
+00:02:09,587 --> 00:02:13,561
+Canary detected eighty-eight point nine
+percent, with ninety-two point three
+
+41
+00:02:13,621 --> 00:02:14,905
+percent alert precision.
+
+42
+00:02:14,965 --> 00:02:20,091
+It had fewer false alerts than clinic
+CUSUM, while clinic CUSUM detected more
+
+43
+00:02:20,151 --> 00:02:20,667
+events.
+
+44
+00:02:20,727 --> 00:02:25,469
+The validation screen shows the full
+tradeoff, including what happens when a
+
+45
+00:02:25,529 --> 00:02:26,813
+feed drops out.
+
+46
+00:02:28,223 --> 00:02:30,891
+The next step is a shadow-mode pilot.
+
+47
+00:02:30,951 --> 00:02:35,438
+Run Canary alongside existing processes,
+agree on an alert budget, and measure
+
+48
+00:02:35,498 --> 00:02:38,894
+whether the earlier signals help people
+make better decisions.
+
+49
+00:02:38,954 --> 00:02:42,349
+Until then, this is a demonstration for
+decision support.
+
+50
+00:02:42,409 --> 00:02:47,260
+Explore the scenarios, review the
+evidence, and see where a small signal can
+
+51
+00:02:47,320 --> 00:02:48,897
+change what you investigate.

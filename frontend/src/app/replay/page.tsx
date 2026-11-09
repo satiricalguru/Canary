@@ -6,7 +6,7 @@ import { Panel } from '@/components/shared/Panel';
 import { RiskTierBadge } from '@/components/shared/RiskTierBadge';
 import { ProvenanceBadge } from '@/components/shared/ProvenanceBadge';
 import { SCENARIOS } from '@/lib/data/seededData';
-import { fetchReplayDay, recordAuditEvent } from '@/lib/api/client';
+import { fetchReplayDays } from '@/lib/api/client';
 import { useDemoRole } from '@/context/RoleContext';
 import { ReplayDayState, ScenarioDefinition } from '@/lib/types/api';
 import {
@@ -38,36 +38,24 @@ export default function ScenarioReplayPage() {
   const [selectedScenarioId, setSelectedScenarioId] = useState<string>('scen-respiratory');
   const [currentDay, setCurrentDay] = useState<number>(4);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const [playbackSpeed, setPlaybackSpeed] = useState<number>(1500); // ms per step
+  const [playbackSpeed, setPlaybackSpeed] = useState<number>(1200); // ms per step
 
-  const [dayState, setDayState] = useState<ReplayDayState | null>(null);
   const [allDays, setAllDays] = useState<ReplayDayState[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
 
   const activeScenario = SCENARIOS.find((s) => s.id === selectedScenarioId) || SCENARIOS[0];
 
-  // Load all days for timeline chart
-  useEffect(() => {
-    fetchReplayDay(selectedScenarioId, currentDay).then((res) => {
-      setDayState(res.dayState);
-      setLoading(false);
-    });
+  const visibleDays = allDays[0]?.scenarioId === selectedScenarioId ? allDays : [];
+  const dayState = visibleDays.find((day) => day.dayNumber === currentDay);
 
-    // Also fetch full trajectory for chart background
-    fetch(`/api/v1/replay/${selectedScenarioId}?all=true`)
-      .then((r) => r.json())
-      .then((data) => {
-        if (data.days) setAllDays(data.days);
-      })
-      .catch((err) => console.error(err));
+  useEffect(() => {
+    const request = new AbortController();
+    setLoadError(false);
+    fetchReplayDays(selectedScenarioId, request.signal)
+      .then(({ days }) => setAllDays(days))
+      .catch(() => { if (!request.signal.aborted) setLoadError(true); });
+    return () => request.abort();
   }, [selectedScenarioId]);
-
-  // Load specific day when slider moves
-  useEffect(() => {
-    fetchReplayDay(selectedScenarioId, currentDay).then((res) => {
-      setDayState(res.dayState);
-    });
-  }, [currentDay, selectedScenarioId]);
 
   // Playback timer
   useEffect(() => {
@@ -89,7 +77,7 @@ export default function ScenarioReplayPage() {
   // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || (e.target instanceof Element && e.target.closest('input, select, textarea, button, a, summary, [contenteditable]'))) return;
 
       if (e.key === 'ArrowRight') {
         e.preventDefault();
@@ -111,7 +99,7 @@ export default function ScenarioReplayPage() {
 
   return (
     <AppShell
-      title="SCENARIO REPLAY"
+      title="Scenario replay"
       description="Inspect how multi-signal risk patterns develop day-by-day and compare Canary early warning lead time against single-stream methods."
     >
       <div className="flex flex-col gap-6">
@@ -169,11 +157,12 @@ export default function ScenarioReplayPage() {
             <div className="flex items-center gap-2 text-xs">
               <span className="text-canary-text-3">Speed:</span>
               <select
+                aria-label="Playback speed"
                 value={playbackSpeed}
                 onChange={(e) => setPlaybackSpeed(Number(e.target.value))}
                 className="bg-panel-inset text-canary-text border border-border rounded px-2 py-0.5 text-xs"
               >
-                <option value={2000}>0.5x</option>
+                <option value={2400}>0.5x</option>
                 <option value={1200}>1.0x</option>
                 <option value={600}>2.0x</option>
               </select>
@@ -184,7 +173,7 @@ export default function ScenarioReplayPage() {
             {/* Replay Chart with Ground Truth Shading and Current Day Line */}
             <div className="w-full h-64 canary-panel-inset p-3">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={allDays} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
+                <LineChart data={visibleDays} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
                   <CartesianGrid stroke="#2C2C2E" strokeDasharray="3 3" vertical={false} />
                   <XAxis
                     dataKey="dayNumber"
@@ -282,6 +271,7 @@ export default function ScenarioReplayPage() {
               {/* Slider Input with Custom Amber Track */}
               <input
                 type="range"
+                aria-label="Replay day"
                 min={1}
                 max={14}
                 value={currentDay}
@@ -335,7 +325,7 @@ export default function ScenarioReplayPage() {
                   <RiskTierBadge tier={dayState?.currentTier || null} size="sm" />
                 </div>
                 <span className="text-canary-text-2">
-                  {dayState?.canaryMarker ? dayState.canaryMarker.details : 'Monitoring within expected baseline'}
+                  {dayState ? (dayState.canaryMarker?.details ?? 'Monitoring within expected baseline') : loadError ? 'Replay unavailable. Reload or select another scenario.' : 'Loading scenario…'}
                 </span>
               </div>
 
@@ -401,11 +391,11 @@ export default function ScenarioReplayPage() {
             >
               <div className="space-y-3 text-xs">
                 <div className="p-3 rounded-control bg-[#7FB45A]/10 border border-[#7FB45A]/30 flex items-center justify-between">
-                  <span className="text-[#7FB45A] font-semibold">vs Absence (EARS C2):</span>
+                  <span className="text-status-ok font-semibold">vs Absence (EARS C2):</span>
                   <span className="text-sm font-bold text-canary-text">+3 Days Lead</span>
                 </div>
                 <div className="p-3 rounded-control bg-[#7FB45A]/10 border border-[#7FB45A]/30 flex items-center justify-between">
-                  <span className="text-[#7FB45A] font-semibold">vs Standalone Clinic (CUSUM):</span>
+                  <span className="text-status-ok font-semibold">vs Standalone Clinic (CUSUM):</span>
                   <span className="text-sm font-bold text-canary-text">+2 Days Lead</span>
                 </div>
                 <p className="text-[11px] text-canary-text-3 leading-relaxed mt-2">

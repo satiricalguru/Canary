@@ -27,19 +27,19 @@ export const RiskTierBadge: React.FC<RiskTierBadgeProps> = ({
 
   let shape = '●';
   let label = 'Watch';
-  let badgeClasses = 'bg-[#E8C14A]/15 border-[#E8C14A]/30 text-[#EDCB63]';
-  let dotColor = '#E8C14A';
+  let badgeClasses = 'bg-tier-watch/15 border-tier-watch/30 text-tier-watch-text';
+  let dotColor = 'var(--tier-watch)';
 
   if (normalized === 'ALERT') {
     shape = '▲';
     label = 'Alert';
-    badgeClasses = 'bg-[#F08A2E]/15 border-[#F08A2E]/30 text-[#F59A4A]';
-    dotColor = '#F08A2E';
+    badgeClasses = 'bg-tier-alert/15 border-tier-alert/30 text-tier-alert-text';
+    dotColor = 'var(--tier-alert)';
   } else if (normalized === 'ACTION') {
     shape = '◆';
     label = 'Action';
-    badgeClasses = 'bg-[#E5483D]/15 border-[#E5483D]/40 text-[#F06B5E] shadow-action-glow';
-    dotColor = '#E5483D';
+    badgeClasses = 'bg-tier-action/15 border-tier-action/40 text-tier-action-text';
+    dotColor = 'var(--tier-action)';
   }
 
   const sizeClasses = {

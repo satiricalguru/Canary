@@ -1,167 +1,62 @@
-# DESIGN: Canary
+# Canary design
 
-## Visual and interaction design specification
+Canary helps occupational health and public-health teams see emerging risks,
+understand the evidence and decide what to investigate. The public landing
+page introduces that workflow. The workspace supports operational review.
 
-**Product:** Canary, a population and workforce health early-warning platform
-**Companion to:** `PRD.md` v1.0
-**Theme reference:** Dark "Disease Surveillance" dashboard (charcoal panels, amber/gold glow, semicircular gauges)
-**Prototype target:** 20 November 2026
+## 1. Visual direction
 
----
+The golden canary is the visual metaphor for an early signal. Its blue-hour
+portrait anchors the landing page. The Dubai waterfront image places the
+surveillance workflow in its demonstration setting. Both images are generated
+illustrations.
 
-## 1. Design intent
+Function informed the editorial serif and quiet health-tech surfaces. Mercury
+informed the blue-hour treatment. Apple informed the large media frame and
+short navigation. Bevel and Superhuman informed the treatment of data and
+photography. The broader reference pass included Freshman, ElevenLabs,
+OpenAI and Vercel for hierarchy, restrained borders and label density.
 
-Canary is a monitoring room, not a marketing site. An HSE officer, occupational physician or district public-health officer opens it to answer four questions quickly: *what changed, where, how sure are we, and what should I consider doing.*
+- [Function](https://styles.refero.design/style/21b71be3-78a0-4681-a5b9-64cc4b40eb67)
+- [Mercury](https://styles.refero.design/style/3172cd4d-118a-4a16-a259-6b634d32322e)
+- [Apple iPhone Duo](https://styles.refero.design/style/a73148b9-449b-42cd-9f38-86ef694f500e)
+- [Bevel](https://styles.refero.design/style/c0717d1a-b446-4166-a445-6497fe287fea)
+- [Superhuman](https://styles.refero.design/style/418b374a-be64-44f0-b17e-1d45308c7e62)
+- [Freshman](https://styles.refero.design/style/a6284fcd-fa69-4469-ac40-4239e5b84a39)
+- [ElevenLabs](https://styles.refero.design/style/031056ff-7af1-46db-8daa-115f731c5d26)
+- [OpenAI](https://styles.refero.design/style/dc541737-8bf2-4b31-b729-0352f696e82f)
+- [Vercel](https://styles.refero.design/style/f24daf3a-d43f-4dec-85a9-8ac1d5148a03)
 
-The look comes from the theme reference: a dark charcoal canvas, lightly lit panels, and a single warm amber light source that gets brighter as risk rises. Calm areas stay dim. Risk is the thing that glows.
+## 2. Palette and typography
 
-### Principles
-
-1. **Risk glows; everything else is quiet.** Amber and red are reserved for signal and risk. Chrome, borders and labels stay in neutral charcoal and warm grey. If everything glows, nothing reads as urgent.
-2. **Evidence before score.** No screen shows a lone number as the reason for an alert. Every score sits next to observed vs expected, contributing streams and completeness (PRD Feature 7).
-3. **Provenance is always visible.** Real environmental data, simulated outcome data and illustrative estimates look different at a glance (section 5).
-4. **Missing is not zero.** Absent data has its own visual state. It never renders as a flat line or an empty bar (PRD Feature 10).
-5. **Colour never works alone.** Every tier and status pairs colour with a shape and a text label (PRD section 9).
-6. **Decision support, not decision.** Language and layout make human review explicit. Nothing looks like an auto-executed action.
-
-### What we take from the reference and what we fix
-
-| Take | Fix |
+| Role | Value |
 |---|---|
-| Charcoal canvas, soft panel depth, subtle topographic header art | The reference has garbled labels, a non-chronological month axis and a duplicated "15K" tick. Canary uses real, ordered, labelled axes. |
-| Amber glow hot-spots on a dark map | The reference is a world map. Canary is a UAE-focused map (Abu Dhabi, Al Ain, Dubai) with site and district layers. |
-| Semicircular gauges with gradient arcs | Gauges only show bounded quantities (completeness, share of sites by tier). Unbounded counts use plain numerals. |
-| Large light-weight numerals with ▲ trend and %. | Every trend states its comparison period ("vs previous 7 days"). |
-| Ranked horizontal bar lists with coloured dots | Dots become tier or provenance shapes, so colour is never the only cue. |
-| Ghost "Full report" buttons | Buttons say what happens: "Open alert", "Replay scenario", "Review and sign off". |
+| Primary brand and headline | `#2F3A55` |
+| Secondary and body text | `#5C6B8A` |
+| Main background | `#F5F6F3` |
+| Workspace surfaces | Subtle neutral layers with hairline slate borders |
+| Severity | Gold watch circle, orange alert triangle, red action diamond |
 
----
+Newsreader Variable supplies the editorial display voice. Manrope Variable
+supplies the body, navigation and controls. Both are self-hosted under OFL 1.1.
+Use tabular numerals for aligned metric values and keep risk tiers paired with
+their shape and text label. The CSS custom properties in
+[globals.css](frontend/src/app/globals.css) are the source of truth for both
+workspace themes.
 
-## 2. Design tokens
+## 3. Layout
 
-### 2.1 Colour
+The landing page moves from the full-screen, scroll-driven canary film to platform
+capabilities, a Dubai workflow, validation and safeguards, and a workspace
+entry point. Copy and actions are regular HTML. The Three.js signal graphic is
+decorative and independent of the film. The portrait is immediately usable
+with reduced motion or without WebGL.
 
-All colours are defined once as CSS variables and consumed by the app, the charts and the map style.
-
-```css
-:root {
-  /* Surfaces */
-  --canvas:        #121213;  /* page background */
-  --canvas-deep:   #0D0D0E;  /* header band, map ocean */
-  --panel:         #1B1B1C;  /* default panel */
-  --panel-raised:  #232324;  /* hover, selected row, popover */
-  --panel-inset:   #161617;  /* wells inside panels, chart plots */
-  --border:        #2C2C2E;  /* panel and divider lines */
-  --border-strong: #3A3A3D;  /* inputs, focus-adjacent */
-  --highlight:     rgba(255, 255, 255, 0.04); /* 1px top inner edge on panels */
-
-  /* Text */
-  --text:          #EDE8DF;  /* primary, warm off-white */
-  --text-2:        #B3AEA4;  /* secondary */
-  --text-3:        #8A857C;  /* tertiary, non-essential only (4.5:1 on --panel) */
-
-  /* Brand / signal light */
-  --amber:         #F2A33A;  /* primary accent, links, focus ring, active nav */
-  --amber-glow:    rgba(242, 163, 58, 0.35);
-
-  /* Risk tiers (always paired with shape + label) */
-  --tier-watch:    #E8C14A;  /* gold */
-  --tier-alert:    #F08A2E;  /* orange */
-  --tier-action:   #E5483D;  /* red */
-  --tier-watch-text:  #EDCB63;
-  --tier-alert-text:  #F59A4A;
-  --tier-action-text: #F06B5E; /* lighter red for text, passes 4.5:1 */
-
-  /* Status */
-  --ok:            #7FB45A;  /* complete, within expected range, improving */
-  --stale:         #B89A5B;  /* delayed or stale feed */
-  --missing:       #6F6B64;  /* no data (rendered hatched, never filled) */
-  --info:          #6FA8C7;  /* real environmental series */
-
-  /* Provenance */
-  --prov-real:     #6FA8C7;  /* real data */
-  --prov-sim:      #C58BD9;  /* simulated data */
-  --prov-illus:    #D9B26F;  /* illustrative estimate */
-}
-```
-
-Notes
-
-- `--prov-*` hues are deliberately outside the amber/red risk range so provenance never gets confused with severity.
-- Use the `-text` tier variants for any small tier-coloured text. Use the base tier colours for fills, rings and glows.
-- Do not use pure `#000` or pure `#FFF`.
-
-### 2.2 Gauge and bar gradients
-
-Taken from the reference: arcs run from a cool-warm start to a hot end.
-
-| Use | Gradient (start → end) |
-|---|---|
-| Neutral progress (completeness) | `#7FB45A` → `#E8C14A` |
-| Warning progress (sites at Alert or above) | `#E8C14A` → `#F08A2E` |
-| Critical progress (sites at Action) | `#F08A2E` → `#E5483D` |
-| Tier bars in ranked lists | Solid tier colour with a 2px brighter leading cap |
-
-### 2.3 Typography
-
-One family, used in two weights to get the reference's look: light for big numerals, medium for everything that must be read.
-
-- **Family:** Manrope, with `Inter, system-ui, sans-serif` fallback.
-- **Numerals:** `font-variant-numeric: tabular-nums` on every number so columns and live-updating values do not jitter. Do not use a monospace face.
-- **Case:** Sentence case everywhere. The only uppercase text is the screen title in the header band, as in the reference.
-
-| Token | Size / line | Weight | Use |
-|---|---|---|---|
-| `display` | 56 / 60 | 300 | Hero numerals in gauges and key metrics |
-| `title-screen` | 28 / 32, letter-spacing 0.02em, uppercase | 500 | Screen title in header band |
-| `title-panel` | 20 / 26 | 500 | Panel titles ("Global outbreak map" style) |
-| `numeral-lg` | 32 / 36 | 300 | Secondary numerals (observed, expected) |
-| `body` | 15 / 22 | 400 | Body and table cells |
-| `body-strong` | 15 / 22 | 600 | Row titles, button labels |
-| `caption` | 13 / 18 | 400 | Captions, axis labels, legends |
-| `micro` | 12 / 16 | 500 | Badges, chips (never below 12px) |
-
-Line length for explanatory text (alert summaries, assumptions) is capped at 70 characters. Left-align all text. Right-align numeric table columns.
-
-### 2.4 Spacing, radius, elevation
-
-- **Spacing scale:** 4, 8, 12, 16, 24, 32, 48. Panel padding 24 (16 on mobile). Gap between panels 16.
-- **Radius:** panels 14, controls and chips 8, badges 6, gauge and bar ends fully round. Different roles get different radii; do not use one radius everywhere.
-- **Panel elevation:** `background: var(--panel)`, `border: 1px solid var(--border)`, plus a 1px top inner highlight (`inset 0 1px 0 var(--highlight)`) and a soft outer shadow `0 12px 32px rgba(0,0,0,.35)`. This reproduces the slightly embossed look of the reference.
-- **Glow:** a tier glow is a `drop-shadow` of the tier colour at 35% opacity and 12 to 20px blur. It is used only on map hot-spots, the active gauge arc and an unacknowledged Action alert.
-
-### 2.5 Iconography
-
-Line icons, 1.5px stroke, 20px default, rounded caps (Lucide or Phosphor). Tier shapes are custom and always filled:
-
-| Tier | Shape | Colour | Label |
-|---|---|---|---|
-| Watch | ● circle | `--tier-watch` | "Watch" |
-| Alert | ▲ triangle | `--tier-alert` | "Alert" |
-| Action | ◆ diamond | `--tier-action` | "Action" |
-
----
-
-## 3. Layout system
-
-### 3.1 App shell
-
-- **Header band** (160px desktop, 96px mobile): `--canvas-deep` with the topographic contour artwork from the reference, low contrast (about 6% lighter than the band), fading out at the bottom. Holds the screen title, a one-sentence plain-language description, and on the right: role switcher, provenance legend and data-freshness indicator.
-- **Navigation:** a slim left rail (72px, icons with tooltips, expands to 220px on hover or focus) for the seven screens. It collapses to a bottom bar below 768px.
-- **Content:** a 12-column grid, max width 1440, 16px gutters, panels as grid items (the reference's bento arrangement).
-- **Persistent demo strip** (24px, under the header): "Demo mode. Outcome data is simulated. Decision support only." It cannot be dismissed.
-
-### 3.2 Breakpoints
-
-| Name | Width | Behaviour |
-|---|---|---|
-| Desktop | ≥ 1200 | Full bento grid |
-| Tablet | 768–1199 | Two columns, map spans full width |
-| Mobile | < 768 | Single column, tables become stacked rows, bottom nav (read-only; no mobile app is in scope) |
-
-### 3.3 Reading order
-
-Top-left is always the primary spatial or evidence view. Right column is the "so what" (metrics, tiers, actions). Bottom row is supporting history and detail. The reference's order (map → metrics → trends) is kept on the overview.
+The workspace uses a labeled navigation rail on desktop and a disclosure menu
+on mobile. The top bar provides the demo role, provenance legend and theme.
+Each page shows a title, a short description and the persistent demo-data notice.
+The dashboard groups the Dubai map and area dossier before illustrative trends
+and metrics. Secondary views retain the screen requirements below.
 
 ---
 
@@ -329,12 +224,14 @@ Rules
 
 ## 8. Motion
 
-Motion is minimal and meaningful.
-
-- **One page-load moment:** on the overview, the map markers fade in with a staggered glow pulse once (about 900ms total), then stay still.
-- **Unacknowledged Action alert:** a slow glow breathe (4s cycle) on the marker. Stops once the alert is viewed.
-- **User-triggered only elsewhere:** drawer slide (200ms), scrubber updates (instant), tab changes (120ms crossfade). No entrance animations on panels or hover lifts on cards.
-- Respect `prefers-reduced-motion`: replace pulses with a static ring, keep all state changes instant.
+Native scrolling advances the full-screen canary film through its timeline.
+The film uses a four-viewport desktop track and a shorter mobile track. The
+opening frame doubles as a poster for reduced motion and delayed video.
+The film was generated with Veo 3.1 Quality in Google Flow, upscaled to
+1080p in Flow and encoded as a silent H.264 MP4 for the website.
+The decorative Three.js renderer renders a short reveal only while in view and pauses while the
+tab is hidden. Reduced motion keeps the static portrait and skips WebGL.
+The [Google Flow prompt](docs/canary-flow-prompt.txt) records the film direction.
 
 ---
 
@@ -371,26 +268,13 @@ Examples
 
 ## 11. Implementation notes
 
-Stack from `PRD.md`: Next.js + TypeScript, MapLibre, Recharts or ECharts.
+The frontend uses Next.js, TypeScript and Tailwind CSS. The landing page uses
+Three.js for its decorative signal field. The Dubai map uses Leaflet and the
+workspace includes SVG and Recharts data views.
 
-- **Tokens:** define section 2 variables in one `tokens.css` and mirror them in a typed `theme.ts` so chart and map code reads the same values.
-- **Charts:** one shared theme object (axis colour `--text-3`, grid `--border` at 50%, tooltip `--panel-raised`). All charts use tier and provenance tokens, not ad hoc colours. Gauges are custom SVG for the gradient arcs.
-- **Map:** one MapLibre style JSON using the token colours; the glow is a blurred circle layer under the marker layer.
-- **Fonts:** self-host Manrope (300, 400, 500, 600) to keep the hosted demo fast and independent of third-party calls.
-- **Components:** build `TierBadge`, `ProvenanceChip`, `CompletenessMeter`, `SuppressedCell` and `Panel` first. Every screen depends on them.
-- **Typed fixtures:** screens render from the shared API fixtures so empty, loading, error, stale and suppressed states can be previewed without the backend.
-- **Security note:** hiding controls in the UI is for clarity only. The backend enforces roles (PRD section 4.2).
-
-### Suggested build order (aligned with PRD P0/P1)
-
-1. Tokens, shell, Panel, TierBadge, ProvenanceChip
-2. Overview map with key metrics and feed health
-3. Alert inbox and alert detail with signal strips and waterfall (P0 core)
-4. Validation table
-5. Privacy and governance screen
-6. Scenario replay
-7. Impact estimator
-8. Motion polish and accessibility pass
+Shared panel, tier, provenance and status components read the theme tokens.
+The backend continues to enforce role restrictions on scoped data. The
+frontend uses those roles to present the appropriate workspace controls.
 
 ---
 

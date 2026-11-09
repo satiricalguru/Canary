@@ -15,7 +15,7 @@ import {
   Flame,
   Wind,
   Activity,
-  Calendar,
+  Play,
   AlertTriangle,
   ArrowRight,
   ShieldCheck,
@@ -29,28 +29,29 @@ export default function DedicatedMapPage() {
   const { activeRole } = useDemoRole();
   const [units, setUnits] = useState<MonitoringUnit[]>([]);
   const [districts, setDistricts] = useState<District[]>([]);
-  const [selectedUnit, setSelectedUnit] = useState<MonitoringUnit | null>(null);
+  const [selectedUnitId, setSelectedUnitId] = useState<string | null>(null);
   const [selectedDistrict, setSelectedDistrict] = useState<string>('all');
   const [activeLayer, setActiveLayer] = useState<LayerType>('all');
-  const [timeOffsetDays, setTimeOffsetDays] = useState<number>(0);
+  const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let isMounted = true;
     setLoading(true);
+    setError(false);
+    setUnits([]);
+    setDistricts([]);
     fetchUnits(activeRole)
       .then((data) => {
         if (!isMounted) return;
         setUnits(data.units);
         setDistricts(data.districts);
-        if (data.units.length > 0) {
-          const alertUnit = data.units.find((u) => u.currentTier === 'ALERT' || u.currentTier === 'ACTION') || data.units[0];
-          setSelectedUnit(alertUnit);
-        }
         setLoading(false);
       })
       .catch((err) => {
+        if (!isMounted) return;
         console.error('Failed to load map data:', err);
+        setError(true);
         setLoading(false);
       });
 
@@ -81,10 +82,12 @@ export default function DedicatedMapPage() {
     return true;
   });
 
+  const selectedUnit = filteredUnits.find((unit) => unit.id === selectedUnitId) ?? filteredUnits[0];
+
   return (
     <AppShell
-      title="GEOSPATIAL SURVEILLANCE & ENVIRONMENTAL EXPOSURE MAP"
-      description="Interactive spatial mapping of environmental hazard priors and syndromic cluster confirmations across the UAE."
+      title="Surveillance map"
+      description="Inspect a demonstration snapshot of monitoring units and risk tiers across the UAE."
     >
       {/* Top Map Control Bar */}
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4 p-4 rounded-panel bg-panel border border-border">
@@ -99,7 +102,7 @@ export default function DedicatedMapPage() {
             onClick={() => setActiveLayer('all')}
             className={`px-3 py-1.5 rounded-control text-xs font-semibold transition-all ${
               activeLayer === 'all'
-                ? 'bg-canary-amber text-canvas-deep shadow-amber-glow'
+                ? 'bg-canary-amber text-canary-on-accent shadow-amber-glow'
                 : 'bg-panel-inset hover:bg-panel-raised text-canary-text-2'
             }`}
           >
@@ -139,17 +142,18 @@ export default function DedicatedMapPage() {
             }`}
           >
             <Activity className="w-3.5 h-3.5" />
-            <span>Active Confirmed Outbreaks</span>
+            <span>Areas at Alert or Action</span>
           </button>
         </div>
 
         {/* District Filter Dropdown */}
-        <div className="flex items-center gap-3">
-          <label className="text-xs text-canary-text-3 font-semibold uppercase">District:</label>
+        <div className="flex max-w-full items-center gap-3">
+          <label htmlFor="map-district" className="text-xs text-canary-text-3 font-semibold uppercase">District</label>
           <select
+            id="map-district"
             value={selectedDistrict}
             onChange={(e) => setSelectedDistrict(e.target.value)}
-            className="bg-panel-inset border border-border text-xs text-canary-text rounded-control px-3 py-1.5 focus:outline-none focus:border-canary-amber"
+            className="min-w-0 bg-panel-inset border border-border text-xs text-canary-text rounded-control px-3 py-1.5 focus:outline-none focus:border-canary-amber"
           >
             <option value="all">All UAE Regions</option>
             {districts.map((d) => (
@@ -176,11 +180,11 @@ export default function DedicatedMapPage() {
               <svg
                 viewBox={`0 0 ${mapWidth} ${mapHeight}`}
                 className="w-full h-full select-none"
-                style={{ filter: 'drop-shadow(0 0 20px rgba(0,0,0,0.6))' }}
+                style={{ filter: 'drop-shadow(0 0 12px var(--amber-glow))' }}
               >
                 <defs>
                   <pattern id="mapGrid" width="40" height="40" patternUnits="userSpaceOnUse">
-                    <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#252528" strokeWidth="0.5" />
+                    <path d="M 40 0 L 0 0 0 40" fill="none" stroke="var(--border-strong)" strokeWidth="0.5" />
                   </pattern>
 
                   <radialGradient id="heatGlowMusaffah" cx="50%" cy="50%" r="50%">
@@ -202,14 +206,14 @@ export default function DedicatedMapPage() {
                 <path
                   d="M 50 300 Q 180 340 320 280 T 520 200 T 720 120 T 880 70"
                   fill="none"
-                  stroke="#2D3035"
+                  stroke="var(--text-3)"
                   strokeWidth="2.5"
                   strokeDasharray="6 4"
                 />
-                <text x="120" y="240" fill="#4B4E54" fontSize="13" fontStyle="italic" letterSpacing="3">
+                <text x="120" y="240" fill="var(--text-2)" fontSize="13" fontStyle="italic" letterSpacing="3">
                   ARABIAN GULF (AL KHALEEJ)
                 </text>
-                <text x="700" y="380" fill="#4B4E54" fontSize="13" fontStyle="italic" letterSpacing="3">
+                <text x="700" y="380" fill="var(--text-2)" fontSize="13" fontStyle="italic" letterSpacing="3">
                   AL KHATIM / AL AIN OASIS
                 </text>
 
@@ -220,7 +224,7 @@ export default function DedicatedMapPage() {
                   <circle cx="680" cy="350" r="110" fill="url(#dustGlowAlAin)" pointerEvents="none" />
                 )}
 
-                <g fill="#6C6D73" fontSize="11" fontWeight="600" letterSpacing="1">
+                <g fill="var(--text-3)" fontSize="11" fontWeight="600" letterSpacing="1">
                   <text x="320" y="240">ABU DHABI ISLAND</text>
                   <text x="380" y="360">MUSAFFAH ICAD</text>
                   <text x="640" y="320">AL AIN OASIS</text>
@@ -243,7 +247,17 @@ export default function DedicatedMapPage() {
                     <g
                       key={unit.id}
                       className="cursor-pointer transition-transform duration-200"
-                      onClick={() => setSelectedUnit(unit)}
+                      role="button"
+                      tabIndex={0}
+                      aria-label={`Inspect ${unit.name}`}
+                      aria-pressed={isSelected}
+                      onClick={() => setSelectedUnitId(unit.id)}
+                      onKeyDown={(event) => {
+                        if (event.key === 'Enter' || event.key === ' ') {
+                          event.preventDefault();
+                          setSelectedUnitId(unit.id);
+                        }
+                      }}
                       transform={`translate(${x}, ${y})`}
                     >
                       {(isAction || isAlert) && (
@@ -261,7 +275,7 @@ export default function DedicatedMapPage() {
                         <circle
                           r="14"
                           fill="none"
-                          stroke="#F2A33A"
+                          stroke="var(--amber)"
                           strokeWidth="2.5"
                           strokeDasharray="4 2"
                         />
@@ -270,17 +284,17 @@ export default function DedicatedMapPage() {
                       <circle
                         r={isSelected ? '9' : '7'}
                         fill={pinColor}
-                        stroke="#121213"
+                        stroke="var(--panel)"
                         strokeWidth="2"
                         className="transition-all"
                       />
 
-                      <circle r="3" fill="#121213" />
+                      <circle r="3" fill="var(--panel)" />
 
                       <text
                         y="20"
                         textAnchor="middle"
-                        fill={isSelected ? '#F2A33A' : '#D1D1D6'}
+                        fill={isSelected ? 'var(--amber)' : 'var(--text)'}
                         fontSize="10"
                         fontWeight={isSelected ? '700' : '500'}
                         className="pointer-events-none"
@@ -319,31 +333,13 @@ export default function DedicatedMapPage() {
               </div>
             </div>
 
-            {/* Bottom Timeline Scrubber */}
-            <div className="p-4 bg-panel-raised border-t border-border flex items-center justify-between gap-4">
-              <div className="flex items-center gap-2 text-xs font-semibold text-canary-text-2">
-                <Calendar className="w-4 h-4 text-canary-amber" />
-                <span>Time-Window Scrub:</span>
-              </div>
-
-              <div className="flex items-center gap-2 flex-1 max-w-md">
-                <span className="text-[10px] text-canary-text-3 font-mono">T-7d</span>
-                <input
-                  type="range"
-                  min="-7"
-                  max="0"
-                  value={timeOffsetDays}
-                  onChange={(e) => setTimeOffsetDays(parseInt(e.target.value))}
-                  className="w-full accent-[#F2A33A] h-1.5 bg-panel-inset rounded-lg cursor-pointer"
-                />
-                <span className="text-[10px] text-canary-amber font-mono font-bold">
-                  {timeOffsetDays === 0 ? 'Today (Live)' : `T${timeOffsetDays}d`}
-                </span>
-              </div>
-
-              <span className="text-[11px] text-canary-text-3">
-                Deterministic replay window: 14 rolling days
+            <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border bg-panel-inset p-4">
+              <span role="status" className="text-xs text-canary-text-2">
+                {loading ? 'Loading monitoring units…' : error ? 'Monitoring units could not be loaded.' : filteredUnits.length ? 'Demonstration snapshot' : 'No monitoring units match these filters.'}
               </span>
+              <Link href="/replay" className="inline-flex min-h-10 items-center gap-2 text-xs font-bold text-canary-amber hover:underline">
+                <Play size={14} /> Explore changes over time
+              </Link>
             </div>
           </Panel>
         </div>
@@ -376,7 +372,7 @@ export default function DedicatedMapPage() {
                 <CompletenessMeter percentage={selectedUnit.completeness} />
                 <div className="text-[11px] text-canary-text-3 pt-1 border-t border-border flex items-center justify-between">
                   <span>Privacy Small-Cell:</span>
-                  <span className="font-semibold text-emerald-400">k ≥ 5 Enforced</span>
+                  <span className="font-semibold text-status-ok">k ≥ 5 Enforced</span>
                 </div>
               </div>
 
@@ -393,7 +389,7 @@ export default function DedicatedMapPage() {
 
               {selectedUnit.openAlertCount > 0 && (
                 <div className="p-3.5 rounded-panel bg-[#E5483D]/10 border border-[#E5483D]/40 space-y-2">
-                  <div className="flex items-center gap-2 text-xs font-bold text-[#F06B5E]">
+                  <div className="flex items-center gap-2 text-xs font-bold text-tier-action-text">
                     <AlertTriangle className="w-4 h-4" />
                     <span>{selectedUnit.openAlertCount} Active Incident Investigation(s)</span>
                   </div>
@@ -424,7 +420,7 @@ export default function DedicatedMapPage() {
             <Panel title="REGION INSPECTION">
               <div className="h-64 flex flex-col items-center justify-center text-center p-6 text-canary-text-3">
                 <MapPin className="w-10 h-10 mb-2 opacity-40 text-canary-amber" />
-                <p className="text-xs">Click any site pin on the UAE map to inspect its real-time signals.</p>
+                <p className="text-xs">Select a site pin or change filters to inspect the available demo signals.</p>
               </div>
             </Panel>
           )}
@@ -432,10 +428,12 @@ export default function DedicatedMapPage() {
           <Panel title="DISTRICT HEALTH ROSTER">
             <div className="space-y-2 text-xs">
               {districts.map((d) => (
-                <div
+                <button
+                  type="button"
                   key={d.id}
+                  aria-pressed={selectedDistrict === d.id}
                   onClick={() => setSelectedDistrict(d.id)}
-                  className={`p-2.5 rounded cursor-pointer transition-colors flex items-center justify-between border ${
+                  className={`w-full p-2.5 rounded cursor-pointer transition-colors flex items-center justify-between border ${
                     selectedDistrict === d.id
                       ? 'bg-panel-raised border-canary-amber text-canary-amber font-semibold'
                       : 'bg-panel-inset border-border text-canary-text-2 hover:bg-panel'
@@ -443,7 +441,7 @@ export default function DedicatedMapPage() {
                 >
                   <span>{d.name}</span>
                   <span className="font-mono text-xs">{d.code}</span>
-                </div>
+                </button>
               ))}
             </div>
           </Panel>

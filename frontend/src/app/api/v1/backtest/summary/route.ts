@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
-import { BACKTEST_SUMMARY } from '@/lib/data/seededData';
+import report from '@/lib/data/validation-report.json';
 
-export async function GET() {
-  return NextResponse.json(BACKTEST_SUMMARY);
+export function GET() {
+  return NextResponse.json(report);
 }
-

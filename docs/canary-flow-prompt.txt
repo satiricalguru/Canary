@@ -1,0 +1,30 @@
+CANARY — THE EARLY SIGNAL
+
+Use Google Flow's Frames mode with the generated canary portrait as the start
+frame. Use Veo 3.1 Quality, 16:9 landscape, 8 seconds and one output. Export
+the 1080p upscale for the website. Preserve the start frame's composition
+for the website crop.
+
+PROMPT
+
+An eight-second, single-take editorial wildlife film for Canary, a population
+and workforce health early-warning platform. Match the supplied start frame
+exactly: one golden domestic canary in left-facing profile on the same dark
+twig, entirely in the right third, against a clean slate-blue background
+(#2F3A55 and #5C6B8A). Lock the camera, lens, exposure, depth of field and
+composition. Preserve the canary's anatomy, proportions, feather texture,
+eye, beak and two feet throughout.
+
+0–2 seconds: quiet hold. Only tiny chest breathing and one natural blink.
+2–5 seconds: the canary briefly lifts its head as if sensing a change. A few
+small, translucent ice-blue points of light emerge far behind the bird,
+strictly in the left half. Two or three fine connections between points
+appear slowly, suggesting separate signals coming together.
+5–8 seconds: the bird settles back into its opening pose. The points and
+lines fade into the blue. End with a quiet hold close to the opening frame.
+
+Restrained lighting, natural motion, premium wildlife photography and an
+optical look. Keep the left side quiet and the bird sharply in focus.
+Keep particles away from the face, body, feet and branch. No flying,
+camera move, cut, color shift, laser, sci-fi interface, labels, logos,
+watermarks, extra birds, human subjects, narration, music or sound effects.

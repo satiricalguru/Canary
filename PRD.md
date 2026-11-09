@@ -956,7 +956,6 @@ with day-to-day project management:
 
 -   `README.md` --- setup, run instructions and project overview.
 -   `ARCHITECTURE.md` --- components, data flow and technical decisions.
--   `TASKS.md` --- implementation checklist and ownership.
 -   `MODEL_CARD.md` --- intended use, methods, evaluation and
     limitations.
 -   `DATA_GOVERNANCE.md` --- data contract, privacy controls, purpose

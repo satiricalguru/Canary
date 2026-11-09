@@ -26,7 +26,7 @@ export const Panel: React.FC<PanelProps> = ({
   return (
     <div className={`canary-panel flex flex-col p-5 ${className}`}>
       {/* Panel Header */}
-      <div className="flex items-center justify-between gap-3 mb-4 pb-2 border-b border-border/60">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-4 pb-2 border-b border-border/60">
         <div className="flex flex-col min-w-0">
           <div className="flex items-center gap-2">
             <h3 className="text-base font-semibold text-canary-text tracking-tight truncate">

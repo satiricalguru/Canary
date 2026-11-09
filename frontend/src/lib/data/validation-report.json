@@ -1,0 +1,213 @@
+{
+  "data": "simulated",
+  "calibration_seeds": [
+    11,
+    29
+  ],
+  "test_seeds": [
+    157,
+    331,
+    557
+  ],
+  "threshold": 2.0,
+  "false_alert_budget_per_site_month": 1.0,
+  "calibration_method": "Maximize event sensitivity within the false-alert budget; break ties by PPV, then higher threshold.",
+  "comparators": {
+    "canary": {
+      "events": 144,
+      "detected_events": 128,
+      "alerts": 182,
+      "false_alerts": 14,
+      "sensitivity": 0.8889,
+      "ppv": 0.9231,
+      "false_alerts_per_unit_month": 0.0324,
+      "clinical_threshold_pairs": 107,
+      "median_lead_vs_clinical_threshold_days": -1.0,
+      "sensitivity_by_syndrome": {
+        "respiratory": 1.0,
+        "gi": 0.7292,
+        "heat": 0.9375
+      }
+    },
+    "ears_c2": {
+      "events": 144,
+      "detected_events": 95,
+      "alerts": 392,
+      "false_alerts": 254,
+      "sensitivity": 0.6597,
+      "ppv": 0.352,
+      "false_alerts_per_unit_month": 0.5884,
+      "clinical_threshold_pairs": 83,
+      "median_lead_vs_clinical_threshold_days": -2.0,
+      "sensitivity_by_syndrome": {
+        "respiratory": 0.7083,
+        "gi": 0.6875,
+        "heat": 0.5833
+      }
+    },
+    "clinic_cusum": {
+      "events": 144,
+      "detected_events": 142,
+      "alerts": 415,
+      "false_alerts": 46,
+      "sensitivity": 0.9861,
+      "ppv": 0.8892,
+      "false_alerts_per_unit_month": 0.1066,
+      "clinical_threshold_pairs": 118,
+      "median_lead_vs_clinical_threshold_days": 0.0,
+      "sensitivity_by_syndrome": {
+        "respiratory": 0.9792,
+        "gi": 1.0,
+        "heat": 0.9792
+      }
+    },
+    "fixed_hazard": {
+      "events": 144,
+      "detected_events": 71,
+      "alerts": 535,
+      "false_alerts": 249,
+      "sensitivity": 0.4931,
+      "ppv": 0.5346,
+      "false_alerts_per_unit_month": 0.5768,
+      "clinical_threshold_pairs": 56,
+      "median_lead_vs_clinical_threshold_days": 3.5,
+      "sensitivity_by_syndrome": {
+        "respiratory": 1.0,
+        "gi": 0.0,
+        "heat": 0.4792
+      }
+    }
+  },
+  "lead_time": {
+    "ears_c2": {
+      "paired_events": 90,
+      "median_days": 1.0,
+      "canary_earlier": 46,
+      "ties": 12,
+      "comparator_earlier": 32
+    },
+    "clinic_cusum": {
+      "paired_events": 127,
+      "median_days": -1.0,
+      "canary_earlier": 23,
+      "ties": 34,
+      "comparator_earlier": 70
+    },
+    "fixed_hazard": {
+      "paired_events": 70,
+      "median_days": -3.0,
+      "canary_earlier": 1,
+      "ties": 4,
+      "comparator_earlier": 65
+    }
+  },
+  "ablations": {
+    "without_environment": {
+      "events": 144,
+      "detected_events": 101,
+      "alerts": 132,
+      "false_alerts": 6,
+      "sensitivity": 0.7014,
+      "ppv": 0.9545,
+      "false_alerts_per_unit_month": 0.0139,
+      "clinical_threshold_pairs": 90,
+      "median_lead_vs_clinical_threshold_days": -3.0,
+      "sensitivity_by_syndrome": {
+        "respiratory": 0.5417,
+        "gi": 0.7292,
+        "heat": 0.8333
+      }
+    },
+    "without_clinic": {
+      "events": 144,
+      "detected_events": 39,
+      "alerts": 54,
+      "false_alerts": 7,
+      "sensitivity": 0.2708,
+      "ppv": 0.8704,
+      "false_alerts_per_unit_month": 0.0162,
+      "clinical_threshold_pairs": 34,
+      "median_lead_vs_clinical_threshold_days": -3.0,
+      "sensitivity_by_syndrome": {
+        "respiratory": 0.4792,
+        "gi": 0.0,
+        "heat": 0.3333
+      }
+    },
+    "without_workplace": {
+      "events": 144,
+      "detected_events": 72,
+      "alerts": 98,
+      "false_alerts": 0,
+      "sensitivity": 0.5,
+      "ppv": 1.0,
+      "false_alerts_per_unit_month": 0.0,
+      "clinical_threshold_pairs": 57,
+      "median_lead_vs_clinical_threshold_days": 0.0,
+      "sensitivity_by_syndrome": {
+        "respiratory": 1.0,
+        "gi": 0.0,
+        "heat": 0.5
+      }
+    },
+    "district_only": {
+      "events": 144,
+      "detected_events": 89,
+      "alerts": 93,
+      "false_alerts": 3,
+      "sensitivity": 0.6181,
+      "ppv": 0.9677,
+      "false_alerts_per_unit_month": 0.0208,
+      "clinical_threshold_pairs": 79,
+      "median_lead_vs_clinical_threshold_days": -1.0,
+      "sensitivity_by_syndrome": {
+        "respiratory": 0.8333,
+        "gi": 0.3542,
+        "heat": 0.6667
+      }
+    },
+    "reporting_delay_2d": {
+      "events": 144,
+      "detected_events": 95,
+      "alerts": 175,
+      "false_alerts": 52,
+      "sensitivity": 0.6597,
+      "ppv": 0.7029,
+      "false_alerts_per_unit_month": 0.1205,
+      "clinical_threshold_pairs": 80,
+      "median_lead_vs_clinical_threshold_days": -2.5,
+      "sensitivity_by_syndrome": {
+        "respiratory": 0.8958,
+        "gi": 0.3542,
+        "heat": 0.7292
+      }
+    },
+    "extra_noise_30pct": {
+      "events": 144,
+      "detected_events": 121,
+      "alerts": 185,
+      "false_alerts": 24,
+      "sensitivity": 0.8403,
+      "ppv": 0.8703,
+      "false_alerts_per_unit_month": 0.0556,
+      "clinical_threshold_pairs": 104,
+      "median_lead_vs_clinical_threshold_days": -1.0,
+      "sensitivity_by_syndrome": {
+        "respiratory": 0.9375,
+        "gi": 0.6667,
+        "heat": 0.9167
+      }
+    }
+  },
+  "latency_ms": {
+    "refresh_and_fit_730_days_median": 2660.04,
+    "scoring_365_days_median": 5.07,
+    "scoring_365_days_p95": 9.39,
+    "ingest_to_scored_snapshot_median": 4.76,
+    "description": "Local runtime. Ingest timing covers SQLite and scoring for two new daily batches after 91 days of single-site history. Source arrival and HTTP transit excluded."
+  },
+  "cadence": {
+    "hazard_fetch_target": "hourly",
+    "outcomes": "daily"
+  }
+}

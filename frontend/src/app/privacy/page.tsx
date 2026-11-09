@@ -29,6 +29,7 @@ export default function PrivacyGovernancePage() {
   const [suppressionRows, setSuppressionRows] = useState<SuppressionDemoRow[]>([]);
   const [auditLogs, setAuditLogs] = useState<AuditEvent[]>([]);
   const [loading, setLoading] = useState(true);
+  const [suppressionError, setSuppressionError] = useState(false);
 
   // Ingestion validation sandbox state
   const [payloadType, setPayloadType] = useState<'valid' | 'forbidden_person' | 'unknown_keys'>('forbidden_person');
@@ -36,15 +37,19 @@ export default function PrivacyGovernancePage() {
   const [testing, setTesting] = useState(false);
 
   useEffect(() => {
-    fetchSuppressionData(kThreshold).then((res) => {
-      setSuppressionRows(res.rows);
-      setLoading(false);
-    });
-
-    fetchAuditLogs().then((res) => {
-      setAuditLogs(res.events);
-    });
+    const request = new AbortController();
+    setLoading(true);
+    setSuppressionError(false);
+    fetchSuppressionData(kThreshold, request.signal)
+      .then((res) => { if (!request.signal.aborted) setSuppressionRows(res.rows); })
+      .catch(() => { if (!request.signal.aborted) setSuppressionError(true); })
+      .finally(() => { if (!request.signal.aborted) setLoading(false); });
+    return () => request.abort();
   }, [kThreshold]);
+
+  useEffect(() => {
+    fetchAuditLogs().then((res) => setAuditLogs(res.events)).catch(() => setAuditLogs([]));
+  }, [activeRole]);
 
   const runIngestionTest = async (type: 'valid' | 'forbidden_person' | 'unknown_keys') => {
     setTesting(true);
@@ -80,25 +85,30 @@ export default function PrivacyGovernancePage() {
       };
     }
 
-    const res = await testIngestPayload(samplePayload);
-    setTestResult(res);
-    setTesting(false);
+    setTestResult(null);
+    try {
+      setTestResult(await testIngestPayload(samplePayload));
+    } catch {
+      setTestResult({ status: 'unavailable', error: 'The ingest validator could not be reached. Try again.' });
+    } finally {
+      setTesting(false);
+    }
   };
 
   return (
     <AppShell
-      title="PRIVACY & GOVERNANCE"
+      title="Privacy & governance"
       description="Privacy by architectural design: Aggregate-only data contracts, mathematical cell suppression, and role-based access control."
     >
       <div className="flex flex-col gap-6">
         {/* Core Non-Negotiable Boundary Card */}
         <div className="p-4 rounded-panel bg-[#E5483D]/10 border border-[#E5483D]/30 flex items-start gap-3">
-          <AlertOctagon className="w-5 h-5 text-[#E5483D] flex-shrink-0 mt-0.5" />
+          <AlertOctagon className="w-5 h-5 text-tier-action-text flex-shrink-0 mt-0.5" />
           <div className="space-y-1">
             <h3 className="text-xs font-bold text-canary-text uppercase tracking-wider">
               Non-Negotiable Responsible Use Boundary
             </h3>
-            <p className="text-xs text-canary-text-2 leading-relaxed">
+            <p className="text-xs text-canary-text leading-relaxed">
               Canary is architected exclusively for population-level and workforce-aggregate hazard surveillance. The platform <strong>never stores, ingests, infers, or exposes person-level health records, individual identities, or worker attendance profiling</strong>. Canary is strictly prohibited from being used for individual disciplinary action or employee performance appraisal.
             </p>
           </div>
@@ -115,10 +125,10 @@ export default function PrivacyGovernancePage() {
                 <div className="p-3.5 rounded-control canary-panel-inset font-mono text-xs text-canary-text-2 space-y-1">
                   <div className="text-canary-amber font-semibold">// Approved Canonical Contract</div>
                   <div>&#123;</div>
-                  <div className="pl-4"><span className="text-[#6FA8C7]">&quot;unit_id&quot;</span>: <span className="text-[#EDCB63]">&quot;site-004&quot;</span>, <span className="text-canary-text-3">// Monitored site / district</span></div>
-                  <div className="pl-4"><span className="text-[#6FA8C7]">&quot;date&quot;</span>: <span className="text-[#EDCB63]">&quot;2026-11-07&quot;</span>, <span className="text-canary-text-3">// Observation bucket</span></div>
-                  <div className="pl-4"><span className="text-[#6FA8C7]">&quot;category&quot;</span>: <span className="text-[#EDCB63]">&quot;respiratory_clinic_visits&quot;</span>,</div>
-                  <div className="pl-4"><span className="text-[#6FA8C7]">&quot;count&quot;</span>: <span className="text-[#F08A2E]">14</span> <span className="text-canary-text-3">// Approved aggregate count</span></div>
+                  <div className="pl-4"><span className="text-prov-real">&quot;unit_id&quot;</span>: <span className="text-tier-watch-text">&quot;site-004&quot;</span>, <span className="text-canary-text-3">// Monitored site / district</span></div>
+                  <div className="pl-4"><span className="text-prov-real">&quot;date&quot;</span>: <span className="text-tier-watch-text">&quot;2026-11-07&quot;</span>, <span className="text-canary-text-3">// Observation bucket</span></div>
+                  <div className="pl-4"><span className="text-prov-real">&quot;category&quot;</span>: <span className="text-tier-watch-text">&quot;respiratory_clinic_visits&quot;</span>,</div>
+                  <div className="pl-4"><span className="text-prov-real">&quot;count&quot;</span>: <span className="text-tier-alert-text">14</span> <span className="text-canary-text-3">// Approved aggregate count</span></div>
                   <div>&#125;</div>
                 </div>
 
@@ -169,13 +179,13 @@ export default function PrivacyGovernancePage() {
                     <div className="flex items-center gap-2 font-bold">
                       {testResult.status === 'accepted' ? (
                         <>
-                          <CheckCircle2 className="w-4 h-4 text-[#7FB45A]" />
-                          <span className="text-[#7FB45A]">HTTP 201: Payload Accepted</span>
+                          <CheckCircle2 className="w-4 h-4 text-status-ok" />
+                          <span className="text-status-ok">HTTP 201: Payload Accepted</span>
                         </>
                       ) : (
                         <>
-                          <XCircle className="w-4 h-4 text-[#E5483D]" />
-                          <span className="text-[#E5483D]">HTTP 400: Ingestion Gate Rejection</span>
+                          <XCircle className="w-4 h-4 text-tier-action-text" />
+                          <span className="text-tier-action-text">HTTP 400: Ingestion Gate Rejection</span>
                         </>
                       )}
                     </div>
@@ -191,7 +201,7 @@ export default function PrivacyGovernancePage() {
 
         {/* Live Small-Cell Suppression Demonstration (PRD Feature 9 & DESIGN.md Section 4.6) */}
         <Panel
-          title="Live Small-Cell Suppression Engine"
+          title="Small-cell suppression preview"
           subtitle="Interactive demonstration of primary k-suppression and secondary total-protection suppression"
           trailingAction={
             <div className="flex items-center gap-3 text-xs">
@@ -200,6 +210,7 @@ export default function PrivacyGovernancePage() {
                 <span className="font-mono font-bold text-canary-amber">k = {kThreshold}</span>
                 <input
                   type="range"
+                  aria-label="Privacy threshold"
                   min={3}
                   max={10}
                   value={kThreshold}
@@ -211,19 +222,20 @@ export default function PrivacyGovernancePage() {
           }
         >
           <div className="space-y-4">
+            {suppressionError && <p role="alert" className="mb-3 text-xs text-tier-action-text">Suppression preview could not be loaded. Adjust the threshold to retry.</p>}
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs text-canary-text border-collapse">
                 <thead className="bg-panel-inset text-canary-text-3 uppercase tracking-wider text-[10px] border-b border-border">
                   <tr>
                     <th className="py-2.5 px-3 font-semibold">Monitoring Unit</th>
                     <th className="py-2.5 px-3 font-semibold">Syndromic Category</th>
-                    <th className="py-2.5 px-3 font-semibold text-right">Raw Count (Internal)</th>
+                    <th className="py-2.5 px-3 font-semibold text-right">Synthetic input</th>
                     <th className="py-2.5 px-3 font-semibold text-center">Export / View Value</th>
                     <th className="py-2.5 px-3 font-semibold">Suppression Rule Applied</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/60">
-                  {suppressionRows.map((row) => (
+                  {(suppressionError ? [] : suppressionRows).map((row) => (
                     <tr key={row.id} className="hover:bg-panel-raised transition-colors">
                       <td className="py-2.5 px-3 font-medium text-canary-text">{row.siteName}</td>
                       <td className="py-2.5 px-3 text-canary-text-2 font-mono text-[11px]">{row.category}</td>
@@ -270,7 +282,7 @@ export default function PrivacyGovernancePage() {
                     <div className="flex items-center justify-between">
                       <span className="font-bold text-canary-text">{r.shortName}</span>
                       {isSelected && (
-                        <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-canary-amber text-canvas-deep">
+                        <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-canary-amber text-canary-on-accent">
                           Active
                         </span>
                       )}
@@ -284,7 +296,7 @@ export default function PrivacyGovernancePage() {
                     <div className="text-canary-text-2">
                       Scope: <strong className="text-canary-text">{r.scope}</strong>
                     </div>
-                    <div className={r.hasHealthDetail ? 'text-[#7FB45A]' : 'text-[#E5483D]'}>
+                    <div className={r.hasHealthDetail ? 'text-status-ok' : 'text-tier-action-text'}>
                       {r.hasHealthDetail ? '✓ Health Count Detail Permitted' : '✗ Health Detail Masked (Compliance Only)'}
                     </div>
                   </div>

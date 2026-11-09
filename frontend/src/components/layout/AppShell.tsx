@@ -1,29 +1,32 @@
 'use client';
 
-import React from 'react';
+import type { ReactNode } from 'react';
 import { Sidebar } from './Sidebar';
 import { TopBar } from './TopBar';
 
 interface AppShellProps {
   title: string;
   description: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
-export const AppShell: React.FC<AppShellProps> = ({ title, description, children }) => {
+export function AppShell({ title, description, children }: AppShellProps) {
   return (
-    <div className="flex h-screen w-full bg-canvas overflow-hidden">
-      {/* Left Rail Sidebar */}
+    <div className="workspace-shell">
+      <a className="canary-skip" href="#workspace-content">Skip to content</a>
       <Sidebar />
-
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
-        <TopBar title={title} description={description} />
-
-        <main className="flex-1 overflow-y-auto px-4 md:px-8 py-6 pb-20 md:pb-8">
-          <div className="max-w-[1440px] mx-auto w-full">{children}</div>
+      <div className="workspace-main">
+        <TopBar />
+        <main id="workspace-content" className="workspace-content" tabIndex={-1}>
+          <div className="workspace-page-heading">
+            <p><span /> Canary workspace</p>
+            <h1>{title}</h1>
+            <div>{description}</div>
+          </div>
+          <p className="workspace-notice">Demo outcome data is simulated <span aria-hidden="true">·</span> Decision support only</p>
+          {children}
         </main>
       </div>
     </div>
   );
-};
+}

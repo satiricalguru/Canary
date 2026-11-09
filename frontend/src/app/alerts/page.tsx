@@ -33,7 +33,10 @@ export default function AlertsInboxPage() {
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
 
-  const loadAlerts = () => {
+  const [refreshCount, setRefreshCount] = useState(0);
+
+  useEffect(() => {
+    const request = new AbortController();
     setLoading(true);
     setError(null);
     fetchAlerts({
@@ -41,21 +44,21 @@ export default function AlertsInboxPage() {
       tier: selectedTier,
       hazard: selectedHazard,
       status: selectedStatus,
+      signal: request.signal,
     })
       .then((data) => {
+        if (request.signal.aborted) return;
         setAlerts(data.alerts);
         setLoading(false);
       })
       .catch((err) => {
+        if (request.signal.aborted) return;
         console.error('Failed to load alerts:', err);
         setError('Alerts could not be loaded. Check the connection and retry.');
         setLoading(false);
       });
-  };
-
-  useEffect(() => {
-    loadAlerts();
-  }, [activeRole, selectedTier, selectedHazard, selectedStatus]);
+    return () => request.abort();
+  }, [activeRole, selectedTier, selectedHazard, selectedStatus, refreshCount]);
 
   const filteredAlerts = alerts.filter((a) => {
     if (!searchQuery) return true;
@@ -70,7 +73,7 @@ export default function AlertsInboxPage() {
 
   return (
     <AppShell
-      title="ALERT INBOX"
+      title="Alert inbox"
       description="Manage active population and workforce health risk alerts across monitored facilities and accommodation networks."
     >
       <div className="flex flex-col gap-6">
@@ -82,6 +85,7 @@ export default function AlertsInboxPage() {
               <Search className="w-4 h-4 text-canary-text-3 absolute left-3 top-2.5" />
               <input
                 type="text"
+                aria-label="Search alerts by site or syndrome"
                 placeholder="Search by site or syndrome..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -90,12 +94,13 @@ export default function AlertsInboxPage() {
             </div>
 
             {/* Tier Filters */}
-            <div className="flex items-center gap-1 bg-panel-inset p-1 rounded-control border border-border">
+            <div className="flex max-w-full flex-wrap items-center gap-1 bg-panel-inset p-1 rounded-control border border-border">
               <span className="text-[11px] font-semibold text-canary-text-3 px-2 uppercase">Tier:</span>
               {(['all', 'ACTION', 'ALERT', 'WATCH'] as const).map((t) => (
                 <button
                   key={t}
                   onClick={() => setSelectedTier(t)}
+                  aria-pressed={selectedTier === t}
                   className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${
                     selectedTier === t
                       ? 'bg-panel-raised text-canary-amber shadow-sm'
@@ -108,7 +113,7 @@ export default function AlertsInboxPage() {
             </div>
 
             {/* Hazard Filters */}
-            <div className="flex items-center gap-1 bg-panel-inset p-1 rounded-control border border-border">
+            <div className="flex max-w-full flex-wrap items-center gap-1 bg-panel-inset p-1 rounded-control border border-border">
               <span className="text-[11px] font-semibold text-canary-text-3 px-2 uppercase">Hazard:</span>
               {[
                 { id: 'all', label: 'All Hazards' },
@@ -119,6 +124,7 @@ export default function AlertsInboxPage() {
                 <button
                   key={h.id}
                   onClick={() => setSelectedHazard(h.id)}
+                  aria-pressed={selectedHazard === h.id}
                   className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${
                     selectedHazard === h.id
                       ? 'bg-panel-raised text-canary-amber shadow-sm'
@@ -144,7 +150,7 @@ export default function AlertsInboxPage() {
               Reset Filters
             </button>
             <button
-              onClick={loadAlerts}
+              onClick={() => setRefreshCount((count) => count + 1)}
               className="p-1.5 rounded-control bg-panel-inset hover:bg-panel-raised border border-border text-canary-text-3 hover:text-canary-amber transition-colors"
               title="Refresh Alerts"
             >
@@ -168,10 +174,10 @@ export default function AlertsInboxPage() {
           ) : error ? (
             /* Error State */
             <div className="p-8 text-center flex flex-col items-center justify-center gap-3">
-              <p className="text-sm text-[#F06B5E] font-medium">{error}</p>
+              <p className="text-sm text-tier-action-text font-medium">{error}</p>
               <button
-                onClick={loadAlerts}
-                className="px-4 py-2 rounded-control bg-canary-amber text-canvas-deep font-semibold text-xs shadow-amber-glow"
+                onClick={() => setRefreshCount((count) => count + 1)}
+                className="px-4 py-2 rounded-control bg-canary-amber text-canary-on-accent font-semibold text-xs shadow-amber-glow"
               >
                 Retry Request
               </button>
@@ -179,7 +185,7 @@ export default function AlertsInboxPage() {
           ) : filteredAlerts.length === 0 ? (
             /* Empty State */
             <div className="py-12 text-center flex flex-col items-center justify-center gap-2">
-              <CheckCircle2 className="w-8 h-8 text-[#7FB45A] opacity-80" />
+              <CheckCircle2 className="w-8 h-8 text-status-ok opacity-80" />
               <p className="text-sm text-canary-text font-medium">
                 No alerts match these filters.
               </p>
@@ -281,10 +287,10 @@ export default function AlertsInboxPage() {
                           <span
                             className={`text-xs capitalize font-medium ${
                               alert.uncertaintyScore === 'low'
-                                ? 'text-[#7FB45A]'
+                                ? 'text-status-ok'
                                 : alert.uncertaintyScore === 'moderate'
-                                ? 'text-[#F08A2E]'
-                                : 'text-[#E5483D]'
+                                ? 'text-tier-alert-text'
+                                : 'text-tier-action-text'
                             }`}
                           >
                             {alert.uncertaintyScore}

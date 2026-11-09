@@ -73,11 +73,7 @@ export const SurveillanceRoomSection: React.FC<SurveillanceRoomSectionProps> = (
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 mb-6 items-stretch">
         {/* Key Metrics: 3 Animated Gauges (Monitored Sites | Active Alerts | Action Required) */}
         <div className="xl:col-span-5 flex flex-col">
-          <KeyMetricsCard
-            monitoredSites={87462}
-            activeAlerts={26}
-            actionRequired={419}
-          />
+          <KeyMetricsCard />
         </div>
 
         {/* Disease Trends Spline Chart & Key Metrics */}

@@ -51,7 +51,7 @@ export default function ImpactEstimatorPage() {
 
   return (
     <AppShell
-      title="HEALTH & RESILIENCE IMPACT ESTIMATOR"
+      title="Impact estimator"
       description="Estimate the potential clinical and operational cases avoided through early detection and proportionate preventive action."
     >
       <div className="flex flex-col gap-6">
@@ -116,7 +116,7 @@ export default function ImpactEstimatorPage() {
               <span className="text-xs font-bold uppercase tracking-wider text-canary-amber">
                 Calibrated (Base Scenario)
               </span>
-              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-canary-amber text-canvas-deep">
+              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-canary-amber text-canary-on-accent">
                 Expected
               </span>
             </div>
@@ -216,6 +216,7 @@ export default function ImpactEstimatorPage() {
               </div>
               <input
                 type="range"
+                aria-label="Intervention uptake"
                 min={20}
                 max={100}
                 value={interventionUptake}
@@ -235,6 +236,7 @@ export default function ImpactEstimatorPage() {
               </div>
               <input
                 type="range"
+                aria-label="Preventive effectiveness"
                 min={10}
                 max={90}
                 value={preventiveEffectiveness}
@@ -254,6 +256,7 @@ export default function ImpactEstimatorPage() {
               </div>
               <input
                 type="range"
+                aria-label="Lead time gain in days"
                 min={0.5}
                 max={6}
                 step={0.1}

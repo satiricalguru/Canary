@@ -19,10 +19,10 @@ export const ProvenanceBadge: React.FC<ProvenanceBadgeProps> = ({
   if (kind === 'real') {
     return (
       <span
-        className={`inline-flex items-center gap-1 rounded bg-[#6FA8C7]/15 border border-[#6FA8C7]/30 text-[#6FA8C7] font-medium ${sizeClasses} ${className}`}
+        className={`inline-flex items-center gap-1 rounded bg-prov-real/15 border border-prov-real/30 text-prov-real font-medium ${sizeClasses} ${className}`}
         title="Real environmental observation feed"
       >
-        <span className="w-1.5 h-1.5 rounded-full bg-[#6FA8C7]" />
+        <span className="w-1.5 h-1.5 rounded-full bg-prov-real" />
         <span>Real{sourceName ? ` · ${sourceName}` : ''}</span>
       </span>
     );
@@ -31,10 +31,10 @@ export const ProvenanceBadge: React.FC<ProvenanceBadgeProps> = ({
   if (kind === 'simulated') {
     return (
       <span
-        className={`inline-flex items-center gap-1 rounded bg-[#C58BD9]/15 border border-[#C58BD9]/30 text-[#C58BD9] font-medium hatched-simulated ${sizeClasses} ${className}`}
+        className={`inline-flex items-center gap-1 rounded bg-prov-sim/15 border border-prov-sim/30 text-prov-sim font-medium hatched-simulated ${sizeClasses} ${className}`}
         title="Simulated health or workplace outcome data"
       >
-        <span className="w-1.5 h-1.5 rounded-sm bg-[#C58BD9]" />
+        <span className="w-1.5 h-1.5 rounded-sm bg-prov-sim" />
         <span>Simulated{sourceName ? ` · ${sourceName}` : ''}</span>
       </span>
     );
@@ -43,7 +43,7 @@ export const ProvenanceBadge: React.FC<ProvenanceBadgeProps> = ({
   if (kind === 'illustrative') {
     return (
       <span
-        className={`inline-flex items-center gap-1 rounded bg-[#D9B26F]/10 border border-dashed border-[#D9B26F]/50 text-[#D9B26F] font-medium ${sizeClasses} ${className}`}
+        className={`inline-flex items-center gap-1 rounded bg-prov-illus/10 border border-dashed border-prov-illus/50 text-prov-illus font-medium ${sizeClasses} ${className}`}
         title="Illustrative scenario-based estimate"
       >
         <span className="text-[10px]">◇</span>
@@ -55,7 +55,7 @@ export const ProvenanceBadge: React.FC<ProvenanceBadgeProps> = ({
   // Approximation (e.g. WBGT)
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded bg-[#B89A5B]/15 border border-[#B89A5B]/30 text-[#E8C14A] font-medium ${sizeClasses} ${className}`}
+      className={`inline-flex items-center gap-1 rounded bg-status-stale/15 border border-status-stale/30 text-tier-watch-text font-medium ${sizeClasses} ${className}`}
       title="Approximation derived from ambient parameters"
     >
       <span>≈ Approximation</span>

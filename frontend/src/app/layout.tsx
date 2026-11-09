@@ -1,7 +1,10 @@
 import type { Metadata } from 'next';
+import '@fontsource-variable/manrope';
+import '@fontsource-variable/newsreader/standard.css';
+import '@fontsource-variable/newsreader/standard-italic.css';
 import './globals.css';
+import './workspace.css';
 import 'leaflet/dist/leaflet.css';
-import { ThemeToggle } from '@/components/layout/ThemeToggle';
 import { RoleProvider } from '@/context/RoleContext';
 
 export const metadata: Metadata = {
@@ -9,8 +12,8 @@ export const metadata: Metadata = {
   description:
     'Sense emerging population and workforce health risk by combining environmental exposure leads with aggregated health-service and workplace outcomes.',
   icons: {
-    icon: '/favicon.ico',
-    apple: '/images/canary-icon-64.png',
+    icon: { url: '/images/canary-logo.svg', type: 'image/svg+xml', sizes: 'any' },
+    apple: { url: '/apple-icon.png', type: 'image/png', sizes: '180x180' },
   },
 };
 
@@ -20,9 +23,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark">
-      <body className="bg-canvas text-canary-text antialiased selection:bg-canary-amber selection:text-canvas-deep">
-        <RoleProvider>{children}<ThemeToggle /></RoleProvider>
+    <html lang="en" className="light" suppressHydrationWarning>
+      <body className="antialiased">
+        <RoleProvider>{children}</RoleProvider>
       </body>
     </html>
   );
