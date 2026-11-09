@@ -5,7 +5,7 @@
 **Version:** 1.0  
 **Purpose:** Establish one consistent way to build Canary, handle failures, protect data and keep the prototype within its intended boundaries.
 
-> Read `PRD.md` for product requirements and `ARCHITECTURE.md` for system design. This file defines the engineering rules that implementations must follow. If documents conflict, do not silently choose: raise the conflict, record the decision in `ASSUMPTIONS.md`, and keep the privacy and safety boundaries in this file.
+> Read `PRD.md` for product requirements and `ARCHITECTURE.md` for system design. This file defines the engineering rules that implementations must follow. If documents conflict, do not silently choose: raise the conflict, record the decision in `MODEL_CARD.md`, and keep the privacy and safety boundaries in this file.
 
 ---
 
@@ -31,8 +31,7 @@
 - `PRD.md`: product scope, behaviours and acceptance criteria.
 - `ARCHITECTURE.md`: components, flows, database and deployment design.
 - `RULES.md`: engineering, coding, error-handling and safety rules.
-- `ASSUMPTIONS.md`: unresolved decisions and explicit assumptions.
-- `MODEL_CARD.md`: intended use, methods, limitations and evaluation.
+- `MODEL_CARD.md`: intended use, methods, assumptions, limitations and evaluation.
 - `DATA_GOVERNANCE.md`: data categories, provenance, retention and access rules.
 - `README.md`: setup, run, test and deployment instructions.
 

@@ -1,4 +1,12 @@
-# Deploy the Canary backend
+# Deploy Canary
+
+## Vercel website
+
+The public [Canary demo](https://canary-jatinjio1212-8258s-projects.vercel.app) runs on the `canary` Vercel project. The project uses Next.js, Node.js 24, the `frontend` root directory, and the `main` production branch. Pushes to `main` trigger production deployments through the Git integration.
+
+The site uses bundled synthetic scenarios and demo endpoints. The FastAPI engine below runs as a separate service.
+
+## FastAPI backend
 
 ## Local demo
 

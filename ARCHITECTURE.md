@@ -552,8 +552,6 @@ canary/
 ├── ARCHITECTURE.md
 ├── MODEL_CARD.md
 ├── DATA_GOVERNANCE.md
-├── ASSUMPTIONS.md
-├── CHANGELOG.md
 ├── .env.example
 ├── .gitignore
 ├── docker-compose.yml
@@ -964,7 +962,7 @@ The architecture creates a path to a future shadow-mode pilot, but the prototype
 
 ## 17. Open implementation decisions
 
-Resolve these during implementation and record the result in `ASSUMPTIONS.md`:
+Resolve these during implementation and record the result in `MODEL_CARD.md`:
 
 1. Confirm the exact observation uniqueness key and whether multiple sources may report the same unit/date/stream/category.
 2. Confirm local-date/timezone handling for the selected UAE locations.

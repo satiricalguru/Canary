@@ -956,12 +956,10 @@ with day-to-day project management:
 
 -   `README.md` --- setup, run instructions and project overview.
 -   `ARCHITECTURE.md` --- components, data flow and technical decisions.
--   `MODEL_CARD.md` --- intended use, methods, evaluation and
+-   `MODEL_CARD.md` --- intended use, methods, assumptions, evaluation and
     limitations.
 -   `DATA_GOVERNANCE.md` --- data contract, privacy controls, purpose
     limitation and retention assumptions.
--   `ASSUMPTIONS.md` --- assumptions, unresolved questions and evidence.
--   `CHANGELOG.md` --- meaningful changes between versions.
 
 **Source basis:** This PRD refines the team's *Canary: Challenge 06
 Build Plan* dated 6 November 2026. It preserves the plan's stated

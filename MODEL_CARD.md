@@ -1,54 +1,28 @@
-# Model Card: Canary Detection Engine
+# Canary detection engine model card
 
-**Model Name:** Canary Multi-Signal Early-Warning Engine  
-**Version:** 1.0 (Prototype)  
-**Date:** November 2026  
-**Type:** Statistical Anomaly Detection & Bayesian Evidence Fusion  
+## Intended use
 
----
+Canary is a prototype for occupational health, site safety, and public health teams reviewing aggregate respiratory, gastrointestinal, and heat-stress signals. An alert shows evidence and uncertainty so a qualified reviewer can decide whether to investigate. Individual diagnosis, employment decisions, and automated dispatch fall outside its intended use.
 
-## 1. Intended Use
+## Methods
 
-### Primary Intended Uses
-- Detecting emerging population and workforce health risk clusters across industrial facilities, construction projects, logistics hubs, and worker accommodations.
-- Decision support for Occupational Health leads, Site HSE officers, and District Public Health coordinators.
-- Providing transparent, explainable evidence (observed vs. expected baselines, contributing streams, and persistence indicators).
+The engine uses a negative-binomial baseline fitted on prior outcome counts, capped and weighted evidence terms, and a capped environmental prior for respiratory and heat scenarios. Correlated environmental inputs contribute a single maximum prior. Missing inputs contribute no term. Persistent evidence can raise the tier, while a spatial scan describes eligible areas and time windows. [Detection methods and evaluation protocol](docs/validation.md)
 
-### Out-of-Scope & Prohibited Uses
-- Individual-level diagnosis, prognosis, or medical triage.
-- Employee performance monitoring, discipline, or individual attendance profiling.
-- Automated dispatch of emergency interventions without human validation.
+## Held-out simulation
 
----
+| Detector | Event sensitivity | Alert precision | False alerts per site-month |
+| --- | ---: | ---: | ---: |
+| Canary fusion | 88.9% | 92.3% | 0.032 |
+| Absence EARS C2 | 66.0% | 35.2% | 0.588 |
+| Clinic CUSUM | 98.6% | 88.9% | 0.107 |
+| Fixed exposure | 49.3% | 53.5% | 0.577 |
 
-## 2. Methodology & Signal Fusion
+The evaluation uses 144 injected events across three held-out seeds. On events both methods detected, Canary led absence EARS C2 by one median day and trailed clinic CUSUM by one median day. These figures characterize a simulation. Clinical effectiveness and operational value require a prospective pilot. [Checked-in results](eval/reports/summary.json)
 
-Canary implements a two-stage fusion model:
-1. **Expected Baseline (Stage 1):** Rolling 12-month negative-binomial Generalized Linear Model (GLM) accounting for day-of-week patterns, annual seasonality, and public holiday shifts.
-2. **Multi-Signal Evidence Fusion (Stage 2):**
-   - Environmental hazard signals (PM2.5, ambient temperature, WBGT) formulate an empirical prior risk.
-   - Syndromic outcome signals (clinic encounters, sickness absence, teleconsultation queries) provide confirmatory posterior likelihood.
-   - Correlated streams within the same reporting domain are discounted by a correlation attenuation factor ($r=0.45$) to prevent double-counting.
-   - Individual stream contributions are capped at 60% of total score to prevent a single noisy feed from dominating the system.
+## Assumptions and pilot decisions
 
----
-
-## 3. Evaluation & Performance
-
-Evaluated against single-signal baselines on held-out synthetic test seeds (Calibration Seed 42, Test Seed 108):
-
-| Metric | EARS C2 (Absence Only) | CUSUM (Clinic Only) | Fixed Threshold (Hazard) | Canary Fusion |
-|---|---|---|---|---|
-| **Event-Level Sensitivity** | 68.2% | 74.5% | 62.0% | **91.8%** |
-| **Lead Time (vs Clinical Threshold)** | -0.4 days | +0.8 days | +1.2 days | **+2.9 days** |
-| **Alert-Level PPV** | 64.0% | 71.3% | 58.6% | **86.4%** |
-| **False Alerts / Site-Month** | 1.82 | 1.45 | 2.10 | **0.74** |
-
----
-
-## 4. Limitations & Caveats
-
-- **Simulated Outcome Ground Truth:** Syndromic health encounters in the prototype are simulated to enable repeatable, privacy-safe benchmarking in the absence of private EHR operational feeds.
-- **Sparse Site Strength Borrowing:** Smaller sites with headcount <200 borrow statistical dispersion parameters from sector aggregates, which may widen uncertainty bounds.
-- **Missing Feeds:** Feeds delayed by >24 hours are removed from fusion calculations rather than imputed, causing a temporary reduction in overall confidence score.
-
+- Exposure-to-outcome relationships and reporting lags vary by scenario. The simulator uses generated patterns at daily resolution. A pilot needs actual data arrival timestamps and independent event labels.
+- Clinic and workplace outcomes are synthetic. Environmental context can come from Open-Meteo CAMS and ECMWF feeds. Check location coverage and feed completeness before use.
+- Impact estimates depend on the uptake and effectiveness values selected in the estimator. Treat them as scenario assumptions.
+- The public website uses seeded data and user-selectable demo roles. Sensitive deployments require authenticated organization and site scope, reviewed access rules, and a defined alert budget. [Deployment modes](docs/deployment.md)
+- Set clinical and operational thresholds with reviewers before a shadow pilot. Document site definitions, expected reporting delays, and the review process. [Data and privacy](DATA_GOVERNANCE.md)

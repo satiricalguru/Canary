@@ -12,7 +12,7 @@
 ![Next.js 16](https://img.shields.io/badge/Next.js-16-2F3A55)
 ![Python 3.12](https://img.shields.io/badge/Python-3.12-2F3A55)
 
-[Quick start](#quick-start) · [Product tour](#product-tour) · [Validation](#validation) · [Technical docs](#technical-docs)
+[Live demo](https://canary-jatinjio1212-8258s-projects.vercel.app) · [Quick start](#quick-start) · [Product tour](#product-tour) · [Validation](#validation) · [Technical docs](#technical-docs)
 
 <img src="docs/media/website-reveal.gif" width="100%" alt="The actual Canary website scrolls through a full-screen canary film as blue signals connect and the caption follows their motion.">
 
@@ -148,7 +148,7 @@ The backend accepts aggregate records and rejects person-level fields. Small val
 | --- | --- |
 | [Architecture](ARCHITECTURE.md) · [API](docs/api.md) | Engine, interfaces, storage, and response contracts |
 | [Product requirements](PRD.md) · [Design](DESIGN.md) | Intended workflows, design system, and interaction |
-| [Rules](RULES.md) · [Model card](MODEL_CARD.md) · [Assumptions](ASSUMPTIONS.md) | Model boundaries, operational assumptions, and evaluation |
+| [Rules](RULES.md) · [Model card and assumptions](MODEL_CARD.md) | Model boundaries, operational assumptions, and evaluation |
 | [Deployment](docs/deployment.md) · [Release audit](docs/release-audit.md) | Demo configuration, verification, and pilot gaps |
 
 ## Next steps
@@ -157,8 +157,19 @@ The backend accepts aggregate records and rejects person-level fields. Small val
 - [ ] Calibrate thresholds on pilot data and review missed events by syndrome.
 - [ ] Replace demo role selection with authenticated organization and site scope before connecting sensitive data.
 
-## Credits
+## Contributors
 
-Canary is released under the [MIT License](LICENSE). Environmental inputs and forecast capabilities are documented by [Open-Meteo](https://open-meteo.com/en/docs/air-quality-api). Codex contributed implementation, testing, and showcase assets. GitHub Actions runs repository verification, and Dependabot maintains dependency updates. The demo narration uses Sarvam Bulbul v3 with Ishita.
+See the [project contribution history](https://github.com/satiricalguru/Canary/graphs/contributors) for authorship. These contributors and automations helped build, verify, and ship Canary.
+
+<table>
+<tr>
+<td align="center" width="25%"><a href="https://github.com/codex"><img src="docs/media/credits/codex.png" width="56" height="56" alt="OpenAI Codex logo"><br><strong>OpenAI Codex</strong></a><br><sub>Implementation, QA, and showcase</sub></td>
+<td align="center" width="25%"><a href="https://github.com/satiricalguru/Canary/actions"><img src="docs/media/credits/github-actions.png" width="56" height="56" alt="GitHub Actions bot avatar"><br><strong>GitHub Actions</strong></a><br><sub>Builds, tests, and security checks</sub></td>
+<td align="center" width="25%"><a href="https://github.com/apps/dependabot"><img src="docs/media/credits/dependabot.png" width="56" height="56" alt="Dependabot avatar"><br><strong>Dependabot</strong></a><br><sub>Dependency updates</sub></td>
+<td align="center" width="25%"><a href="https://github.com/apps/vercel"><img src="docs/media/credits/vercel.png" width="56" height="56" alt="Vercel bot avatar"><br><strong>Vercel</strong></a><br><sub>Production deploys and commit status</sub></td>
+</tr>
+</table>
+
+Canary is released under the [MIT License](LICENSE). Environmental inputs and forecast capabilities are documented by [Open-Meteo](https://open-meteo.com/en/docs/air-quality-api). The demo narration uses Sarvam Bulbul v3 with Ishita.
 
 <div align="center"><sub><a href="#canary">Back to top ↑</a></sub></div>
